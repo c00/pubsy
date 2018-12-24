@@ -1,6 +1,8 @@
 import { NgBuildTask } from '../tasks/NgBuildTask';
 import { EchoTask } from '../tasks/EchoTask';
 import { Task } from './Task';
+
+import { CommanderStatic as commander } from 'commander';
 export class Pubsy {
 
   private tasks: Task[] = [];
@@ -18,7 +20,6 @@ export class Pubsy {
       .action(() => {
         console.log("Building...");
         this.tasks.push(new NgBuildTask({ base: '/log-viewer/' }));
-        
       });
 
     program.command('hi [message]')
