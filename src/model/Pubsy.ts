@@ -1,11 +1,11 @@
 import * as commander from 'commander';
+import { existsSync, readFileSync } from 'fs';
 import * as yaml from 'js-yaml';
 
-import { EchoTask } from '../tasks/EchoTask';
-import { Task } from './Task';
-import { existsSync, readFileSync } from 'fs';
-import { NgBuildTask } from '../tasks/NgBuildTask';
 import { CopyTask } from '../tasks/CopyTask';
+import { EchoTask } from '../tasks/EchoTask';
+import { NgBuildTask } from '../tasks/NgBuildTask';
+import { Environment } from './Environment';
 
 export class Pubsy {
   private taskList = {
@@ -13,14 +13,12 @@ export class Pubsy {
     echo: EchoTask,
     copy: CopyTask,
   };
-  private tasks: Task[] = [];
+
   private config: any;
+  //todo make taskSet per environment.
+  private environments: Environment[] = [];
 
-  constructor() {
-
-  }
-
-  public registerTask(name, type) {
+  public registerTask(name: string, type) {
     this.taskList[name] = type;
   }
 
@@ -30,15 +28,10 @@ export class Pubsy {
       .version('0.1.0')
       .option('-c --config <path>', 'Path to pubsy config file. Defaults to pubsy.yml')
       .command('build')
+      .option('-e --environment <name>', 'Environment name. If no environments are defined, ignore this option.')
       .action(() => {
         this.loadConfig();
-        this.loadTasks();
-        this.runTasks();
-      });
-
-    commander.command('hi [message]')
-      .action((message) => {
-        this.tasks.push(new EchoTask({ message }));
+        this.loadEnvironments();
         this.runTasks();
       });
 
@@ -63,28 +56,64 @@ export class Pubsy {
     }
   }
 
-  private loadTasks() {
+  private loadEnvironments() {
+    //If no environments are defined, we just create a default one and use that
+    //If at least 1 env is defined
+    //   And we have a -e, we use that one.
+    //   And we don't have  a -e, we use the default one.
+    //   If there's not default and no -e, we error.
+    if (!this.config.environments) {
+      this.config.environments = [{ name: 'default', default: true }];
+    }
+
+    let defaultEnv: Environment;
+    let selectedEnv: Environment;
+
+    for (let e of this.config.environments) {
+      e.taskList = [];
+      if (e.default && !defaultEnv) defaultEnv = e;
+      if (e.name === commander.environment && !selectedEnv) selectedEnv = e;
+    }
+
+    if (selectedEnv) {
+      this.loadTasks(selectedEnv);
+      this.environments.push(selectedEnv);
+    } else if (defaultEnv) {
+      this.loadTasks(defaultEnv);
+      this.environments.push(defaultEnv);
+    } else {
+      console.error("No environment chosen. Set a default Environment, or use the --environment flag");
+      process.exit(1);
+    }
+  }
+
+  private loadTasks(e: Environment) {
     for (let t of this.config.tasks) {
       if (t.enabled === false) continue;
 
-      const task = new this.taskList[t.name](t.params);
+      const task = new this.taskList[t.name](e, t.params);
       task.description = t.description;
-      this.tasks.push(task);
+      e.taskList.push(task);
     }
   }
 
   private async runTasks() {
-    for (let t of this.tasks) {
-      try {
-        console.log(`### TASK: ${t.description} ###`);
-        await t.run();
-      } catch (ex) {
-        console.error(`Error while running ${t.name}: ${t.description}`)
-        console.dir(t);
-        throw ex;
+    for (let e of this.environments) {
+      console.log("Running task set on environment: " + e.name);
+
+      for (let t of e.taskList) {
+        try {
+          console.log(`### TASK: ${t.description} ###`);
+          await t.run();
+        } catch (ex) {
+          console.error(`Error while running ${t.name}: ${t.description}`)
+          console.dir(t);
+          throw ex;
+        }
+
       }
-      
     }
-    console.log("Tasks complete");
+
+    console.log("Pubsy done!");
   }
 }

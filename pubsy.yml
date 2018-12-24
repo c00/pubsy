@@ -7,11 +7,13 @@ tasks:
         - '**/*.ts'
       dest: 'test/.test-files/'
       exclude: 'node_modules/**/*'
+    enabled: true
   - name: copy
     description: 'Copying config files.'
     params: 
       source: 'tsconfig.json'
       dest: 'test/.test-files/'
+    enabled: false
   - name: ngBuild
     description: 'Building Angular App'
     params: 
@@ -29,3 +31,12 @@ tasks:
     description: The same task twice?
     params:
       message: Yup.
+environments:
+  - name: local
+    outputBase: dist/
+    default: true
+  - name: bessy
+    isRemote: true
+    outputBase: dist/
+    hostName: bessy.kwuote.com
+    key: ~/.ssh/id_rsa

@@ -1,43 +1,42 @@
-import { copyFileSync, existsSync, mkdirSync } from 'fs';
+import { copyFileSync, existsSync } from 'fs';
 import * as glob from 'glob';
-import * as shelljs from 'shelljs';
 import { basename, dirname } from 'path';
+import * as shelljs from 'shelljs';
 
 import { Task } from '../model/Task';
 
 
-export class CopyTask implements Task {
+export class CopyTask extends Task {
   name = 'ngBuild';
 
-  private defaultParams: Partial<CopyTaskParams> = { preservePath: true }
+  protected defaultParams: Partial<CopyTaskParams> = { preservePath: true }
   private _files: string[] = [];
   private _resolve;
-  private _reject;
 
-  constructor(public params: CopyTaskParams) {
-    this.checkParams();
-    
-    this.params = { ...this.defaultParams, ...this.params };
-  }
-
-  private checkParams() {
+  private checkParams(): null|string {
     if (!this.params.source || !this.params.dest) {
-      throw "I need a source and dest for this task (CopyTask)";
+      return "I need a source and dest for this task (CopyTask)";
     }
 
     const illegalStart = ['.', '/'];
     const sources = (typeof this.params.source === 'string') ? [this.params.source] : this.params.source;
     for (let s of sources) {
       if (illegalStart.indexOf(s.substring(0, 1)) > -1) {
-        throw "Sources cannot start with '/', './' or '../'. Use cwd to change the working directory.";
+        return "Sources cannot start with '/', './' or '../'. Use cwd to change the working directory.";
       }
     }
+
+    return null;
   }
 
   public run(): Promise<any> {
+    
+
     return new Promise((resolve, reject) => {
       this._resolve = resolve;
-      this._reject = reject;
+
+      const result = this.checkParams();
+      if (result) reject(result);
 
       this.runAsync();
     });

@@ -1,25 +1,31 @@
+import { exec } from 'child_process';
+
 import { Task } from '../model/Task';
-import { execSync, exec } from 'child_process';
+import { Helper } from '../model/Helper';
 
-export class NgBuildTask implements Task {
+export class NgBuildTask extends Task {
   name = 'ngBuild';
-  static defaultParams = {
+  protected defaultParams: NgBuildTaskOptions = {
     base: '/',
-    output: './dist/'
+    output: '%outputBase%dist/'
   };
-
-  constructor(public params?: any) {
-    if (!this.params) this.params = {};
-    this.params = { ...NgBuildTask.defaultParams, ...params };
-  }
+  params: NgBuildTaskOptions;
 
   public run() {
     return new Promise((resolve, reject) => {
-      exec(`ng build --output-path "${this.params.output}" --base-href ${this.params.base} --prod`, (err) => {
+      //Replace outputBase if it exists
+      const output = Helper.replaceAll(this.params.output, '%outputBase%', this.environment.outputBase)
+      
+      exec(`ng build --output-path "${output}" --base-href ${this.params.base} --prod`, (err) => {
         if (err) reject(err);
 
         resolve();
       });
     });
   }
+}
+
+export interface NgBuildTaskOptions {
+  base: string;
+  output: string;
 }

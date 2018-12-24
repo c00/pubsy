@@ -1,11 +1,12 @@
 import { Task } from '../model/Task';
 
-export class EchoTask implements Task {
+export class EchoTask extends Task {
   name = 'echo';
+  protected defaultParams = {
+    message: 'Hello Planet!'
+  };
 
-  constructor(public params?: EchoTaskOptions) { 
-    if (!this.params) this.params.message = "Good morning, planet!";
-  }
+  params: EchoTaskOptions;
 
   public run() {
     if (this.params.messages) {
