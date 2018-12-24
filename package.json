@@ -1,0 +1,24 @@
+{
+  "name": "pubsy",
+  "version": "1.0.0",
+  "description": "Deployment / Publishing library for Angular 2+",
+  "main": "bin/index.js",
+  "scripts": {
+    "build": "tsc --outDir bin",
+    "tsw": "tsc --outDir bin -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "pubsy": "./bin/index.js"
+  },
+  "author": "Co van Leeuwen",
+  "license": "MIT",
+  "dependencies": {
+    "@types/bluebird": "^3.5.25",
+    "@types/node": "^10.12.18",
+    "commander": "^2.19.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.2.2"
+  }
+}
