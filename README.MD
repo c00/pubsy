@@ -10,10 +10,8 @@ Rollbacks
 No node needed on server side
 
 ## Todo
-Deal with errors in tasks
 Build tasks
-- Angular build
-- Copy (with globbing?)
+- Copy (with globbing)
 - Zip 
 - Remote command
   Unzip

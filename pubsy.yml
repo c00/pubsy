@@ -1,0 +1,31 @@
+tasks: 
+  - name: copy
+    description: 'Copying files to dist folder.'
+    params: 
+      source: 
+        - '**/*.js'
+        - '**/*.ts'
+      dest: 'test/.test-files/'
+      exclude: 'node_modules/**/*'
+  - name: copy
+    description: 'Copying config files.'
+    params: 
+      source: 'tsconfig.json'
+      dest: 'test/.test-files/'
+  - name: ngBuild
+    description: 'Building Angular App'
+    params: 
+      base: /
+      output: dist/
+    enabled: false
+  - name: echo
+    description: 'Sir mixalot speaks'
+    params: 
+      messages:
+        - I like big butts
+        - And I cannot lie
+        - All you other brothers can't deny
+  - name: echo
+    description: The same task twice?
+    params:
+      message: Yup.

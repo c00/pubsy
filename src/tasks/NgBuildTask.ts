@@ -10,12 +10,10 @@ export class NgBuildTask implements Task {
 
   constructor(public params?: any) {
     if (!this.params) this.params = {};
-    this.params = { ...this.params, ...params };
+    this.params = { ...NgBuildTask.defaultParams, ...params };
   }
 
   public run() {
-    console.log("Building Angular App...");
-
     return new Promise((resolve, reject) => {
       exec(`ng build --output-path "${this.params.output}" --base-href ${this.params.base} --prod`, (err) => {
         if (err) reject(err);

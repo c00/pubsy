@@ -1,7 +1,7 @@
 import { Task } from '../model/Task';
 
 export class EchoTask implements Task {
-  name = 'ngBuild';
+  name = 'echo';
 
   constructor(public params?: EchoTaskOptions) { 
     if (!this.params) this.params.message = "Good morning, planet!";
