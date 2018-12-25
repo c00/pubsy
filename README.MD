@@ -10,14 +10,13 @@ Rollbacks
 No node needed on server side
 
 ## Todo
-Make Environments
-- Get it to work with the outputbase thing
 Build tasks
 - Zip 
 - Remote command
   Unzip
   Symlink
 - Rollback
+- Delete stuff
 Documentation
 Testing
 Output default help

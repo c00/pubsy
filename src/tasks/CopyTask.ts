@@ -7,7 +7,7 @@ import { Task } from '../model/Task';
 
 
 export class CopyTask extends Task {
-  name = 'ngBuild';
+  name = 'copy';
 
   protected defaultParams: Partial<CopyTaskParams> = { dest: '' }
   private _files: string[] = [];

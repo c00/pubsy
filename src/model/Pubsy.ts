@@ -8,12 +8,15 @@ import { NgBuildTask } from '../tasks/NgBuildTask';
 import { Environment } from './Environment';
 import { Config } from './Config';
 import { resolve } from 'path';
+import { RmTask } from '../tasks/RmTask';
+import * as shelljs from 'shelljs';
 
 export class Pubsy {
   private taskList = {
     ngBuild: NgBuildTask,
     echo: EchoTask,
     copy: CopyTask,
+    rm: RmTask,
   };
 
   private config: Config;
@@ -106,8 +109,13 @@ export class Pubsy {
   }
 
   private async runTasks() {
+    const wd = shelljs.pwd() + "";
+
     for (let e of this.environments) {
       console.log("Running task set on environment: " + e.name);
+      
+      //Reset working directory
+      shelljs.cd(wd);
 
       for (let t of e.taskList) {
         try {
