@@ -1,0 +1,16 @@
+tasks: 
+  - name: copyToRemote
+    description: minimal
+    label: minimal
+    params: 
+      cwd: test/assets
+      source: 
+        - testing.md
+
+environments: 
+  - name: Bessy
+    buildPath: test/.build/
+    isRemote: true
+    host: bessy.kwuote.com
+    deployPath: /home/coo/test/pubsy/
+    default: true

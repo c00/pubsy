@@ -1,24 +1,26 @@
 import * as glob from 'glob';
-import * as JSZip from 'jszip';
+import { dirname } from 'path';
 import * as shelljs from 'shelljs';
 
 import { Task } from '../model/Task';
-import { createWriteStream, readFileSync, lstatSync, existsSync } from 'fs';
-import { resolve, dirname } from 'path';
 
 
+export class CopyToRemoteTask extends Task {
+  name = 'copyToRemote';
 
-export class ZipTask extends Task {
-  name = 'zip';
-
-  protected defaultParams: Partial<ZipTaskParams> = { dest: 'files.zip', createDestFolder: true }
+  protected defaultParams: Partial<CopyTaskParams> = { dest: '' }
   private _files: string[] = [];
   private _resolve;
-  public params: ZipTaskParams;
+  public params: CopyTaskParams;
 
-  private checkParams(): null | string {
+  private checkParams(): null|string {
     if (!this.params.source || !this.params.dest) {
-      return "I need a source and dest for this task (ZipTask)";
+      return "I need a source and dest for this task (CopyToRemoteTask)";
+    }
+
+    //Check home folder
+    if (this.params.dest.substring(0, 1) === '~') {
+      return "Can't use ~ on remote destination";
     }
 
     const illegalStart = ['.', '/'];
@@ -33,17 +35,17 @@ export class ZipTask extends Task {
   }
 
   public run(): Promise<any> {
-    this.setDefaults();
+    this.setDefaults();    
 
-    return new Promise((res, reject) => {
-      this._resolve = res;
+    return new Promise((resolve, reject) => {
+      this._resolve = resolve;
 
       //Prepend the buildPath
-      if (this.environment.buildPath) this.params.dest = resolve(this.environment.buildPath + this.params.dest);
+      if (this.environment.deployPath) this.params.dest = this.environment.deployPath + this.params.dest;
 
-      const result = this.checkParams();
+      const result = this.checkParams();      
 
-      if (result) reject(result);
+      if (result) return reject(result);
 
       this.runAsync();
     });
@@ -58,7 +60,7 @@ export class ZipTask extends Task {
 
     this._files = files.filter(f => excluded.indexOf(f) === -1);
 
-    this.zip();
+    this.copy();
   }
 
   private async getPaths(pattern: string | string[]) {
@@ -83,34 +85,33 @@ export class ZipTask extends Task {
     });
   }
 
-  private zip() {
-    let zip = new JSZip();
-
+  private async copy() {
     for (let f of this._files) {
-      if (lstatSync(f).isFile()) zip.file(f, readFileSync(f));
-    }
+      //Get destination directory
+      const dest = this.getDest(f, this.params.dest);
 
-    //Create folder if we need to.
-    if (this.params.createDestFolder) {
-      const dir = dirname(this.params.dest);
-      if (!existsSync(dir)) shelljs.mkdir('-p', dir);
+      //Make dir if necessary
+      const destPath = dirname(dest);
+      await this.environment.remote.mkdir(destPath);
+      
+      //Copy files
+      await this.environment.remote.putFile(f, dest);      
     }
+    console.log(this._files.length + " files copied.");
+    this._resolve();
+  }
 
-    //Write out the zip file.
-    zip
-    .generateNodeStream({ compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true })
-    .pipe(createWriteStream(this.params.dest))
-    .on('finish', () => {
-      console.log(`${this.params.dest} created.`);
-      this._resolve();
-    });
+  private getDest(source: string, destPath: string) {
+    
+    if (destPath.substring(destPath.length - 1) !== '/') destPath += '/';
+
+    return destPath + source;
   }
 }
 
-export interface ZipTaskParams {
+export interface CopyTaskParams {
   source: string | string[];
   exclude?: string | string[];
-  createDestFolder?: boolean;
   dest: string;
   cwd?: string;
 }

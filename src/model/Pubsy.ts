@@ -11,6 +11,9 @@ import { resolve } from 'path';
 import { RmTask } from '../tasks/RmTask';
 import * as shelljs from 'shelljs';
 import { ZipTask } from '../tasks/ZipTask';
+import { EEXIST } from 'constants';
+import { SshManager } from './SshManager';
+import { CopyToRemoteTask } from '../tasks/CopyToRemoteTask';
 
 export class Pubsy {
   private taskList = {
@@ -19,6 +22,7 @@ export class Pubsy {
     copy: CopyTask,
     rm: RmTask,
     zip: ZipTask,
+    copyToRemote: CopyToRemoteTask,
   };
 
   private config: Config;
@@ -100,6 +104,9 @@ export class Pubsy {
   }
 
   private loadTasks(e: Environment) {
+    //Setup remote
+    e.remote = new SshManager(e);
+
     for (let t of this.config.tasks) {
       if (t.enabled === false) continue;
 
@@ -111,15 +118,15 @@ export class Pubsy {
   }
 
   private async runTasks() {
-    const wd = shelljs.pwd() + "";
+    const wd = resolve(shelljs.pwd() + "");
 
     for (let e of this.environments) {
       console.log("Running task set on environment: " + e.name);
-      
-      //Reset working directory
-      shelljs.cd(wd);
 
       for (let t of e.taskList) {
+        //Reset working directory
+        shelljs.cd(wd);
+        
         try {
           console.log(`### TASK: ${t.description} ###`);
           await t.run();
@@ -130,6 +137,7 @@ export class Pubsy {
         }
 
       }
+      e.remote.dispose();
     }
 
     console.log("Pubsy done!");
@@ -152,8 +160,11 @@ export class Pubsy {
         }
 
       }
+
+      e.remote.dispose();
     }
 
     console.log("Pubsy done!");
+    process.exit(0);
   }
 }

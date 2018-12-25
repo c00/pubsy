@@ -11,14 +11,15 @@ No node needed on server side
 
 ## Todo
 Build tasks
-- Zip 
 - Remote command
   Unzip
   Symlink
 - Rollback
+- RemoteDeployTask that uses all those other tasks 
 Documentation
 Testing
 Output default help
+colors and spinners
 
 # Documentation
 The entire module works off of the yaml file. All tasks are 
