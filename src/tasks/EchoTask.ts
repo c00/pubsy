@@ -9,6 +9,8 @@ export class EchoTask extends Task {
   params: EchoTaskOptions;
 
   public run() {
+    this.setDefaults();
+    
     if (this.params.messages) {
       for (let m of this.params.messages){
         console.log(m);

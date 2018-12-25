@@ -9,6 +9,7 @@
   "compilerOptions": {
       "module": "commonjs",
       "target": "es6",
+      "outDir": "bin",
       "sourceMap": true
   }
 }

@@ -6,6 +6,8 @@ import { CopyTask } from '../tasks/CopyTask';
 import { EchoTask } from '../tasks/EchoTask';
 import { NgBuildTask } from '../tasks/NgBuildTask';
 import { Environment } from './Environment';
+import { Config } from './Config';
+import { resolve } from 'path';
 
 export class Pubsy {
   private taskList = {
@@ -14,8 +16,7 @@ export class Pubsy {
     copy: CopyTask,
   };
 
-  private config: any;
-  //todo make taskSet per environment.
+  private config: Config;
   private environments: Environment[] = [];
 
   public registerTask(name: string, type) {
@@ -23,16 +24,22 @@ export class Pubsy {
   }
 
   public run() {
-
     commander
       .version('0.1.0')
       .option('-c --config <path>', 'Path to pubsy config file. Defaults to pubsy.yml')
-      .command('build')
       .option('-e --environment <name>', 'Environment name. If no environments are defined, ignore this option.')
+      .command('build')
       .action(() => {
         this.loadConfig();
         this.loadEnvironments();
         this.runTasks();
+      });
+
+    commander.command('run <label>')
+      .action((label: string) => {
+        this.loadConfig();
+        this.loadEnvironments();
+        this.runTask(label);
       });
 
     commander.parse(process.argv);
@@ -43,7 +50,7 @@ export class Pubsy {
     console.debug("Using configuration file: " + configFile);
 
     if (!existsSync(configFile)) {
-      console.error("Configuration file not found:" + configFile);
+      console.error("Configuration file not found: " + resolve(configFile));
       process.exit(1);
     }
 
@@ -93,6 +100,7 @@ export class Pubsy {
 
       const task = new this.taskList[t.name](e, t.params);
       task.description = t.description;
+      task.label = t.label;
       e.taskList.push(task);
     }
   }
@@ -102,6 +110,28 @@ export class Pubsy {
       console.log("Running task set on environment: " + e.name);
 
       for (let t of e.taskList) {
+        try {
+          console.log(`### TASK: ${t.description} ###`);
+          await t.run();
+        } catch (ex) {
+          console.error(`Error while running ${t.name}: ${t.description}`)
+          console.dir(t);
+          throw ex;
+        }
+
+      }
+    }
+
+    console.log("Pubsy done!");
+  }
+
+  private async runTask(label: string) {
+    for (let e of this.environments) {
+      console.log(`Running tasks with label '${label}' on environment: ${e.name}`);
+
+      for (let t of e.taskList) {
+        if (t.label !== label) continue;
+
         try {
           console.log(`### TASK: ${t.description} ###`);
           await t.run();

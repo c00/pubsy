@@ -18,7 +18,6 @@ tasks:
     description: 'Building Angular App'
     params: 
       base: /
-      output: dist/
     enabled: false
   - name: echo
     description: 'Sir mixalot speaks'
@@ -33,10 +32,11 @@ tasks:
       message: Yup.
 environments:
   - name: local
-    outputBase: dist/
+    buildPath: .build/intermediate/
+    deployPath: .build/deployed
     default: true
   - name: bessy
     isRemote: true
-    outputBase: dist/
+    buildPath: dist/
     hostName: bessy.kwuote.com
     key: ~/.ssh/id_rsa

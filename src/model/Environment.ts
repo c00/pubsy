@@ -1,7 +1,8 @@
 import { Task } from './Task';
 export interface Environment {
   name: string;
-  outputBase?: string;
+  buildPath?: string;
+  deployPath?: string;
   isRemote?: boolean;
   hostName?: string;
   key?: string;

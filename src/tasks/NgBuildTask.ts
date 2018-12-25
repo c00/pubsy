@@ -12,11 +12,13 @@ export class NgBuildTask extends Task {
   params: NgBuildTaskOptions;
 
   public run() {
+    this.setDefaults();
+    
     return new Promise((resolve, reject) => {
-      //Replace outputBase if it exists
-      const output = Helper.replaceAll(this.params.output, '%outputBase%', this.environment.outputBase)
+      //Prepend the buildPath
+      if (this.environment.buildPath) this.params.output = this.environment.buildPath + this.params.output;
       
-      exec(`ng build --output-path "${output}" --base-href ${this.params.base} --prod`, (err) => {
+      exec(`ng build --output-path "${this.params.output}" --base-href ${this.params.base} --prod`, (err) => {
         if (err) reject(err);
 
         resolve();

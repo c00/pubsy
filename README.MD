@@ -21,3 +21,13 @@ Build tasks
 Documentation
 Testing
 Output default help
+
+# Documentation
+The entire module works off of the yaml file. All tasks are 
+
+## Environments
+An environment has a name and a bunch of optional properties. 
+
+## Tasks
+
+### Settig up the configuration yaml

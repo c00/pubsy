@@ -1,0 +1,38 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy help",
+      "program": "${workspaceFolder}/src/index.ts",
+      "args": ["--help"],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy Copy minimal",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/copyTask.yml",
+        "run", 
+        "minimal"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
+    }
+  ]
+}

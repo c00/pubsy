@@ -1,0 +1,23 @@
+tasks: 
+  - name: copy
+    description: All possible options
+    label: allOptions
+    params: 
+      cwd: test
+      source: 
+        - assets/subfolder/*
+        - assets/testing.md
+        - assets/*.txt
+      exclude: '**/file.txt'
+      dest: subfolder/under/buildpath/
+      flatten: true      
+  - name: copy
+    description: 'Minimal with label'
+    label: minimal
+    params: 
+      source: 'test/assets/**/*'
+
+environments: 
+  - name: local
+    buildPath: test/.build/
+    default: true

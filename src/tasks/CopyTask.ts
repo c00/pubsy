@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync } from 'fs';
+import { copyFileSync, existsSync, lstatSync } from 'fs';
 import * as glob from 'glob';
 import { basename, dirname } from 'path';
 import * as shelljs from 'shelljs';
@@ -9,9 +9,10 @@ import { Task } from '../model/Task';
 export class CopyTask extends Task {
   name = 'ngBuild';
 
-  protected defaultParams: Partial<CopyTaskParams> = { preservePath: true }
+  protected defaultParams: Partial<CopyTaskParams> = { dest: '' }
   private _files: string[] = [];
   private _resolve;
+  public params: CopyTaskParams;
 
   private checkParams(): null|string {
     if (!this.params.source || !this.params.dest) {
@@ -30,12 +31,16 @@ export class CopyTask extends Task {
   }
 
   public run(): Promise<any> {
-    
+    this.setDefaults();    
 
     return new Promise((resolve, reject) => {
       this._resolve = resolve;
 
-      const result = this.checkParams();
+      //Prepend the buildPath
+      if (this.environment.buildPath) this.params.dest = this.environment.buildPath + this.params.dest;
+
+      const result = this.checkParams();      
+
       if (result) reject(result);
 
       this.runAsync();
@@ -86,18 +91,19 @@ export class CopyTask extends Task {
       const wd = shelljs.pwd() + "/";
       const destPath = dirname(dest);
       if (!existsSync(destPath)) shelljs.mkdir('-p', wd + destPath);
-
+      
       //Copy files
-      copyFileSync(f, dest);
+      if (lstatSync(f).isFile()) copyFileSync(f, dest);
       
     }
     console.log(this._files.length + " files copied.");
   }
 
   private getDest(source: string, destPath: string) {
+    
     if (destPath.substring(destPath.length - 1) !== '/') destPath += '/';
 
-    if (!this.params.preservePath) return destPath + basename(source);
+    if (this.params.flatten) return destPath + basename(source);
 
     return destPath + source;
   }
@@ -107,6 +113,6 @@ export interface CopyTaskParams {
   source: string | string[];
   exclude?: string | string[];
   dest: string;
-  preservePath?: boolean;
+  flatten?: boolean;
   cwd?: string;
 }
