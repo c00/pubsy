@@ -1,0 +1,13 @@
+tasks: 
+  - name: zip
+    description: Create zil file from test build.
+    label: zipTest
+    params: 
+      cwd: test/assets
+      source: '**/*'
+      dest: 'testFiles.zip'
+
+environments: 
+  - name: local
+    buildPath: test/.build/
+    default: true

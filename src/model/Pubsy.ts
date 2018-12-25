@@ -10,6 +10,7 @@ import { Config } from './Config';
 import { resolve } from 'path';
 import { RmTask } from '../tasks/RmTask';
 import * as shelljs from 'shelljs';
+import { ZipTask } from '../tasks/ZipTask';
 
 export class Pubsy {
   private taskList = {
@@ -17,6 +18,7 @@ export class Pubsy {
     echo: EchoTask,
     copy: CopyTask,
     rm: RmTask,
+    zip: ZipTask,
   };
 
   private config: Config;

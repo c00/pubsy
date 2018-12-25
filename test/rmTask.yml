@@ -1,0 +1,16 @@
+tasks: 
+  - name: rm
+    description: Clear test build folder.
+    label: clearTest
+    params: 
+      targets: test/.build/*
+  - name: rm
+    description: error because of path.
+    label: errorTest
+    params: 
+      targets: ./test/.build/*
+
+environments: 
+  - name: local
+    buildPath: test/.build/
+    default: true

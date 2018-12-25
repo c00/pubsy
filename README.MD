@@ -16,7 +16,6 @@ Build tasks
   Unzip
   Symlink
 - Rollback
-- Delete stuff
 Documentation
 Testing
 Output default help
