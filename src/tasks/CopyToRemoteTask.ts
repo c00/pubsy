@@ -42,7 +42,7 @@ export class CopyToRemoteTask extends Task {
 
       //Prepend the buildPath
       if (this.environment.deployPath) this.params.dest = this.environment.deployPath + this.params.dest;
-
+      console.debug(this.params.dest);
       const result = this.checkParams();      
 
       if (result) return reject(result);

@@ -1,6 +1,7 @@
 import { Environment } from './Environment';
 import SSH = require('node-ssh');
 import * as username from 'username';
+import { basename } from 'path';
 
 export class SshManager {
   private connected = false;
@@ -31,16 +32,21 @@ export class SshManager {
     };
 
     return this.ssh.connect(config)
-    .then( () => this.connected = true );
+    .then( () => {
+      this.connected = true;
+    });
        
   }
 
   public putFile(local: string, remote: string): Promise<any> {
+    console.debug("Putting file: " + basename(remote), local, remote);
     return this.connect()
     .then(() => this.ssh.putFile(local, remote) );
   }
 
   public exec(command: string, params?: string[], options?: any): Promise<string> {
+    if (!params) params = [];
+    console.debug(`Exec: ${command} ${params.join(' ')}`)
     return this.connect()
     .then(() => this.ssh.exec(command, params, options) );
   }
@@ -50,13 +56,23 @@ export class SshManager {
     .then(() => this.exec('mkdir', ['-p', path]));
   }
 
-  public unzip(file: string, removeFileAfter?: boolean): Promise<any> {
+  public unzip(file: string, dest: string, removeFileAfter?: boolean): Promise<any> {
     //todo check if unzip is supported
     return this.connect()
-    .then(() => this.exec('unzip', [file]))
+    .then(() => this.exec('unzip', ['-o', file, '-d', dest]))
     .then(() => {
-      if (removeFileAfter) return this.exec('rm', [file])
+      if (removeFileAfter) return this.exec('rm', [file]);
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
     });
+  }
+
+  public symlink(source: string, dest: string) {
+    return this.connect()
+    .then(() => this.exec('rm', [dest]))
+    .then(() => this.exec('ln', ['-sf', source, dest]))
   }
 
   public dispose() {

@@ -1,0 +1,14 @@
+tasks: 
+  - name: deployRemote
+    description: Deploy to remote
+    params: 
+      source: testFiles.zip
+
+environments: 
+  - name: Bessy
+    buildPath: test/.build/
+    isRemote: true
+    host: bessy.kwuote.com
+    deployPath: /home/coo/test/pubsy/
+    default: true
+    keepDeployments: 2

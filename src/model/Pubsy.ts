@@ -11,9 +11,10 @@ import { resolve } from 'path';
 import { RmTask } from '../tasks/RmTask';
 import * as shelljs from 'shelljs';
 import { ZipTask } from '../tasks/ZipTask';
-import { EEXIST } from 'constants';
 import { SshManager } from './SshManager';
 import { CopyToRemoteTask } from '../tasks/CopyToRemoteTask';
+import { UnzipTask } from '../tasks/UnzipTask';
+import { DeployRemoteTask } from '../tasks/DeployRemoteTask';
 
 export class Pubsy {
   private taskList = {
@@ -23,6 +24,8 @@ export class Pubsy {
     rm: RmTask,
     zip: ZipTask,
     copyToRemote: CopyToRemoteTask,
+    unzipRemote: UnzipTask,
+    deployRemote: DeployRemoteTask,
   };
 
   private config: Config;
@@ -110,6 +113,10 @@ export class Pubsy {
     for (let t of this.config.tasks) {
       if (t.enabled === false) continue;
 
+      if (!this.taskList[t.name]) {
+        console.error("Unknown task " + t.name);
+        process.exit(1);
+      }
       const task = new this.taskList[t.name](e, t.params);
       task.description = t.description;
       task.label = t.label;
@@ -126,7 +133,7 @@ export class Pubsy {
       for (let t of e.taskList) {
         //Reset working directory
         shelljs.cd(wd);
-        
+
         try {
           console.log(`### TASK: ${t.description} ###`);
           await t.run();

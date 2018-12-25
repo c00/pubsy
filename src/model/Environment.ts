@@ -6,6 +6,7 @@ export interface Environment {
   deployPath?: string;
   isRemote?: boolean;
   default?: boolean;
+  keepDeployments?: number;
 
   //ssh stuff
   host?: string;

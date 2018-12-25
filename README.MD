@@ -11,11 +11,8 @@ No node needed on server side
 
 ## Todo
 Build tasks
-- Remote command
-  Unzip
-  Symlink
-- Rollback
 - RemoteDeployTask that uses all those other tasks 
+- Rollback
 Documentation
 Testing
 Output default help
