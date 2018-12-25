@@ -26,7 +26,7 @@ export class RollbackRemoteTask extends Task {
       }
       target = this.params.buildId;
     } else {
-      console.log(`Rolling back ${this.params.amount} deployments.`)
+      console.log(`Rolling back ${this.params.amount} deployment(s).`)
       const currentIndex = list.indexOf(current);
       if (this.params.amount > currentIndex) {
         throw `Can't rollback ${this.params.amount} times. We only have ${currentIndex} earlier deployments available. Canceling rollback.`;

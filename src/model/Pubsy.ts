@@ -10,7 +10,7 @@ import { DeployRemoteTask } from '../tasks/DeployRemoteTask';
 import { EchoTask } from '../tasks/EchoTask';
 import { NgBuildTask } from '../tasks/NgBuildTask';
 import { RmTask } from '../tasks/RmTask';
-import { RollbackRemoteTask } from '../tasks/RollbackRemoteTask';
+import { RollbackRemoteTask, RollbackRemoteTaskOptions } from '../tasks/RollbackRemoteTask';
 import { UnzipTask } from '../tasks/UnzipTask';
 import { ZipTask } from '../tasks/ZipTask';
 import { Config } from './Config';
@@ -54,6 +54,13 @@ export class Pubsy {
         this.loadConfig();
         this.loadEnvironments();
         this.runTask(label);
+      });
+
+    commander.command('rollback [amountOrBuildId]')
+      .action((amountOrBuildId: string) => {
+        this.loadConfig();
+        this.loadEnvironments();
+        this.rollback(amountOrBuildId)        
       });
 
     commander.parse(process.argv);
@@ -175,5 +182,29 @@ export class Pubsy {
 
     console.log("Pubsy done!");
     process.exit(0);
+  }
+
+  private async rollback(amountOrBuildId?) {
+    if (!amountOrBuildId) amountOrBuildId = 1;
+
+    let params: RollbackRemoteTaskOptions = {};
+    if (isNaN(amountOrBuildId) ){
+      params.buildId = amountOrBuildId;
+    } else {
+      params.amount = amountOrBuildId;
+    }
+
+    for (let e of this.environments) {
+      const task = new RollbackRemoteTask(e, params);
+      try {
+        console.log("Handling environment " + e.name);
+        await task.run();
+      } catch (error) {
+        console.warn('Rollback failed for environment ' + e.name);
+      }
+    
+      e.remote.dispose();
+    }
+    
   }
 }
