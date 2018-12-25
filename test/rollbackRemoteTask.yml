@@ -1,0 +1,20 @@
+tasks: 
+  - name: rollbackRemote
+    description: Rollback remote by 2
+    label: byAmount
+    params: 
+      amount: 2
+  - name: rollbackRemote
+    description: Rollback to specific ID
+    label: byId
+    params: 
+      buildId: build-2018-12-25-1545753351704
+
+environments: 
+  - name: Bessy
+    buildPath: test/.build/
+    isRemote: true
+    host: bessy.kwuote.com
+    deployPath: /home/coo/test/pubsy/
+    default: true
+    keepDeployments: 5

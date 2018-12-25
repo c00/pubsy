@@ -1,20 +1,21 @@
 import * as commander from 'commander';
 import { existsSync, readFileSync } from 'fs';
 import * as yaml from 'js-yaml';
+import { resolve } from 'path';
+import * as shelljs from 'shelljs';
 
 import { CopyTask } from '../tasks/CopyTask';
+import { CopyToRemoteTask } from '../tasks/CopyToRemoteTask';
+import { DeployRemoteTask } from '../tasks/DeployRemoteTask';
 import { EchoTask } from '../tasks/EchoTask';
 import { NgBuildTask } from '../tasks/NgBuildTask';
-import { Environment } from './Environment';
-import { Config } from './Config';
-import { resolve } from 'path';
 import { RmTask } from '../tasks/RmTask';
-import * as shelljs from 'shelljs';
-import { ZipTask } from '../tasks/ZipTask';
-import { SshManager } from './SshManager';
-import { CopyToRemoteTask } from '../tasks/CopyToRemoteTask';
+import { RollbackRemoteTask } from '../tasks/RollbackRemoteTask';
 import { UnzipTask } from '../tasks/UnzipTask';
-import { DeployRemoteTask } from '../tasks/DeployRemoteTask';
+import { ZipTask } from '../tasks/ZipTask';
+import { Config } from './Config';
+import { Environment } from './Environment';
+import { SshManager } from './SshManager';
 
 export class Pubsy {
   private taskList = {
@@ -26,6 +27,7 @@ export class Pubsy {
     copyToRemote: CopyToRemoteTask,
     unzipRemote: UnzipTask,
     deployRemote: DeployRemoteTask,
+    rollbackRemote: RollbackRemoteTask,
   };
 
   private config: Config;

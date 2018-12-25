@@ -11,4 +11,4 @@ environments:
     host: bessy.kwuote.com
     deployPath: /home/coo/test/pubsy/
     default: true
-    keepDeployments: 2
+    keepDeployments: 5
