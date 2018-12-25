@@ -33,6 +33,95 @@
       "outFiles": [
         "${workspaceFolder}/bin/**/*.js"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy rm test folder",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/rmTask.yml",
+        "run", 
+        "clearTest"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy rm error",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/rmTask.yml",
+        "run", 
+        "errorTest"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy zip",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/zipTask.yml",
+        "run", 
+        "zipTest"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy remote copy",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/copyToRemoteTask.yml",
+        "run", 
+        "minimal"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy Unzip on remote",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/unzipRemoteTask.yml",
+        "build"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
     }
   ]
 }
