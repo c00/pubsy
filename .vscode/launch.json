@@ -122,6 +122,76 @@
       "outFiles": [
         "${workspaceFolder}/bin/**/*.js"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy Deploy to remote",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/deployRemoteTask.yml",
+        "build"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy Rollback by 2",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/rollbackRemoteTask.yml",
+        "run",
+        "byAmount"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy Rollback to ID",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/rollbackRemoteTask.yml",
+        "run",
+        "byId"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Pubsy Rollback form command line",
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-c", 
+        "test/rollbackRemoteTask.yml",
+        "rollback"
+      ],
+      "runtimeExecutable": null,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/bin/**/*.js"
+      ]
     }
   ]
 }
