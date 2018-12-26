@@ -9,6 +9,9 @@ Rollbacks
 No node needed on server side
 
 ## Todo
+Error handling should work better
+Success of exec commands should be checked.
+async/await stuff should be refactored slightly.
 Documentation
 Testing
 Output default help

@@ -32,5 +32,7 @@ export abstract class Task implements iTask {
   protected setDefaults() {
     if (!this.params) this.params = {};
     this.params = { ...this.defaultParams, ...this.params };
+
+    if (!this.environment) this.environment = { name: 'default', default: true };
   }
 }
