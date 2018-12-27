@@ -1,10 +1,11 @@
-import { existsSync } from 'fs';
 import * as moment from 'moment';
-import { basename } from 'path';
 
 import { Task } from '../model/Task';
 import { CopyToRemoteTask } from './CopyToRemoteTask';
 import { UnzipTask } from './UnzipTask';
+import { ZipTask } from './ZipTask';
+import * as shelljs from 'shelljs';
+import { SymlinkRemoteTask } from './SymlinkRemoteTask';
 
 export class DeployRemoteTask extends Task {
   name = 'deployRemote';
@@ -17,28 +18,35 @@ export class DeployRemoteTask extends Task {
   public async run() {
     this.setDefaults();
 
-    const buildId = `build-${moment().format('YYYY-MM-DD')}-${+ moment()}`;
+    //Set the buildId if necessary.
+    if (!this.environment.buildId) {
+      this.environment.buildId = `build-${moment().format('YYYY-MM-DD')}-${+ moment()}`;
+    }
 
-    if (!this.params.source) throw "No source zip file.";
+    const buildId = this.environment.buildId;
 
-    const source = this.environment.buildPath + this.params.source;
-    if (!existsSync(source)) throw `File '${source}' doesn't exist`;
-    
+    if (!this.params.source) throw "No source files.";
+
+    const wd = shelljs.pwd();
+    let tasks: Task[] = [];
+
     //Setup tasks
-    const copy = new CopyToRemoteTask(this.environment, { source: this.params.source, cwd: this.environment.buildPath });
-    const unzip = new UnzipTask(this.environment, {source: basename(this.params.source), dest: buildId, removeAfter: true });
+    const zipName = 'build.zip';
+    tasks.push(new ZipTask(this.environment, { source: '**/*', dest: zipName }, "Compressing..."));
+    tasks.push(new CopyToRemoteTask(this.environment, { source: zipName, cwd: this.environment.buildPath }, "Copying to remote..."));
+    tasks.push(new UnzipTask(this.environment, { source: zipName, dest: buildId, removeAfter: true }, "Extracting..."));
+    tasks.push(new SymlinkRemoteTask(this.environment, { source: buildId, dest: this.environment.deployPath + 'current' }, "Linking new build..."));
 
-    //Copy to remote
-    await copy.run();
-    //Unzip remotely 
-    await unzip.run();
-    //Set symlink
-    await this.environment.remote.symlink(buildId, this.environment.deployPath + 'current');
+    for (let t of tasks) {
+      console.log(t.description);
+      shelljs.cd(wd);
+      await t.run();
+    }
 
-    //Cleanup old environments
+    console.log("Cleaning up old deployments...");
     await this.cleanOldDeployments();
 
-    console.log(`Deployed ${buildId}!`);
+    console.log(`Deployed successfully! Id: ${buildId}!`);
   }
 
   private async cleanOldDeployments() {
@@ -63,5 +71,5 @@ export class DeployRemoteTask extends Task {
 }
 
 export interface DeployRemoteTaskOptions {
-  source: string;
+  source: string | string[];
 }

@@ -1,0 +1,15 @@
+tasks: 
+  - name: symlinkRemote
+    description: Create symlink remotely
+    label: symlinkTest
+    params: 
+      source: build-1234
+      dest: /home/coo/some-app/current
+
+environments: 
+  - name: Bessy
+    buildPath: test/.build/
+    isRemote: true
+    host: bessy.kwuote.com
+    deployPath: /home/coo/test/pubsy/
+    default: true

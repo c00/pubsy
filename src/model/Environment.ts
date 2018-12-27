@@ -3,6 +3,7 @@ import { SshManager } from './SshManager';
 export interface Environment {
   name: string;
   buildPath?: string;
+  buildId?: string;
   deployPath?: string;
   isRemote?: boolean;
   default?: boolean;

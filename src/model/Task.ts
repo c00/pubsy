@@ -15,12 +15,12 @@ export abstract class Task implements iTask {
   protected defaultParams: any = {};
   name: string;
   label?: string;
-  description?: string;
   enabled?: boolean;
   
   constructor(
     public environment?: Environment, 
-    public params?: any
+    public params?: any,
+    public description?: string
   ) {
     /* //Set parameters
     if (!this.params) this.params = {};

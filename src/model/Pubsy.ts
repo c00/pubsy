@@ -16,6 +16,7 @@ import { ZipTask } from '../tasks/ZipTask';
 import { Config } from './Config';
 import { Environment } from './Environment';
 import { SshManager } from './SshManager';
+import { SymlinkRemoteTask } from '../tasks/SymlinkRemoteTask';
 
 export class Pubsy {
   private taskList = {
@@ -28,6 +29,7 @@ export class Pubsy {
     unzipRemote: UnzipTask,
     deployRemote: DeployRemoteTask,
     rollbackRemote: RollbackRemoteTask,
+    symlinkRemote: SymlinkRemoteTask,
   };
 
   private config: Config;
