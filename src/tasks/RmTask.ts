@@ -2,13 +2,12 @@ import * as shelljs from 'shelljs';
 
 import { Task } from '../model/Task';
 
-
 export class RmTask extends Task {
   name = 'rm';
 
   public params: RmTaskParams;
 
-  private checkParams(): null|string {
+  private checkParams(): null | string {
     if (!this.params.targets) {
       return "I need a target for this task (RmTask)";
     }
@@ -24,26 +23,20 @@ export class RmTask extends Task {
     return null;
   }
 
-  public run(): Promise<any> {
-    this.setDefaults();    
+  public async run() {
+    this.setDefaults();
 
-    return new Promise((resolve, reject) => {
+    const result = this.checkParams();
+    if (result) throw result;
 
-      const result = this.checkParams();      
-
-      if (result) reject(result);
-
-      try{
-        shelljs.rm('-rf', this.params.targets)
-      } catch (e) {
-        reject(e);
-      }
-      
-      resolve();
-    });
+    try {
+      shelljs.rm('-rf', this.params.targets)
+    } catch (e) {
+      throw e;
+    }
   }
 }
 
 export interface RmTaskParams {
-  targets: string|string[];
+  targets: string | string[];
 }

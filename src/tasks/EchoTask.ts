@@ -8,7 +8,7 @@ export class EchoTask extends Task {
 
   params: EchoTaskOptions;
 
-  public run() {
+  public async run() {
     this.setDefaults();
     
     if (this.params.messages) {
@@ -18,8 +18,7 @@ export class EchoTask extends Task {
     } else {
       console.log(this.params.message);
     }
-
-    return Promise.resolve();
+    
   }
 
   

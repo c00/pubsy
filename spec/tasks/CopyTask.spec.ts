@@ -3,6 +3,7 @@ import { CopyTaskParams, CopyTask } from '../../src/tasks/CopyTask';
 import { FileHelper } from '../helpers/FileHelper';
 import { stat, existsSync } from "fs";
 import { Environment } from '../../src/model/Environment';
+import { mkdir } from "shelljs";
 
 const defaultParams: CopyTaskParams = {
   source: 'test/assets/**/*',
@@ -11,13 +12,8 @@ const defaultParams: CopyTaskParams = {
 const fh = new FileHelper();
 
 describe("Copy functions", () => {
-  /* 
-  dest: string;
-  cwd?: string;
-
-  test errors
-  Test environment buildPath
-   */
+  //Make the dir in case it doesn't exist.
+  mkdir(defaultParams.dest);
 
   it("Copy all files", async (done) => {
     fh.rimraf(defaultParams.dest + "*");
@@ -120,11 +116,29 @@ describe("Copy functions", () => {
     const t = new CopyTask(env, params);
     await t.run();
 
-    expect(fh.countFiles(defaultParams.dest, true)).toBe(9);
-    expect(fh.countFilesAndFolders(defaultParams.dest, true)).toBe(10); //1 subfolder
+    expect(fh.countFiles(env.buildPath, true)).toBe(9);
+    expect(fh.countFilesAndFolders(env.buildPath, true)).toBe(10); //1 subfolder
 
+    expect(existsSync(env.buildPath + "test")).toBe(false);
+
+    done();
+  });
+
+
+  it("uses the buildPath AND dest", async (done) => {
+    const params: CopyTaskParams = { cwdSource: 'test/assets', source: '**/*', dest: 'patrick/' };
+    const env: Environment = { name: 'test', buildPath: 'test/.build/' } 
+
+    fh.rimraf(env.buildPath + "*");
+    expect(fh.countFilesAndFolders(env.buildPath, true)).toBe(0);
     
-    expect(existsSync(params.dest + "test")).toBe(false);
+    const t = new CopyTask(env, params);
+    await t.run();
+
+    expect(fh.countFiles(env.buildPath, true)).toBe(9);
+    expect(fh.countFilesAndFolders(env.buildPath, true)).toBe(11);
+
+    expect(existsSync(env.buildPath + params.dest)).toBe(true);
 
     done();
   });
