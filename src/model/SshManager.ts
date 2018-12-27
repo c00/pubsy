@@ -71,12 +71,13 @@ export class SshManager {
 
   public symlink(source: string, dest: string) {
     return this.connect()
-    .then(() => this.exec('rm', [dest]))
-    .then(() => this.exec('ln', ['-sf', source, dest]))
+    .then(() => this.exec('ln', ['-nsf', source, dest]))
   }
 
   public dispose() {
-    console.debug("Disconnecting from remote.");
-    if (this.ssh) this.ssh.dispose();
+    if (this.ssh) {
+      console.debug("Disconnecting from remote.");
+      this.ssh.dispose();
+    }
   }
 }

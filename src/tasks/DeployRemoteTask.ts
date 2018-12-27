@@ -24,11 +24,15 @@ export class DeployRemoteTask extends Task {
     const source = this.environment.buildPath + this.params.source;
     if (!existsSync(source)) throw `File '${source}' doesn't exist`;
     
+    //Setup tasks
     const copy = new CopyToRemoteTask(this.environment, { source: this.params.source, cwd: this.environment.buildPath });
     const unzip = new UnzipTask(this.environment, {source: basename(this.params.source), dest: buildId, removeAfter: true });
 
+    //Copy to remote
     await copy.run();
+    //Unzip remotely 
     await unzip.run();
+    //Set symlink
     await this.environment.remote.symlink(buildId, this.environment.deployPath + 'current');
 
     //Cleanup old environments

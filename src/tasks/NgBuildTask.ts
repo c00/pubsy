@@ -7,7 +7,7 @@ export class NgBuildTask extends Task {
   name = 'ngBuild';
   protected defaultParams: NgBuildTaskOptions = {
     base: '/',
-    output: '%outputBase%dist/'
+    output: ''
   };
   params: NgBuildTaskOptions;
 

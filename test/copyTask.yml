@@ -3,12 +3,13 @@ tasks:
     description: All possible options
     label: allOptions
     params: 
-      cwd: test
+      cwdSource: test/base/for/source
       source: 
         - assets/subfolder/*
         - assets/testing.md
         - assets/*.txt
       exclude: '**/file.txt'
+      cwdDest: test/base/for/output
       dest: subfolder/under/buildpath/
       flatten: true      
   - name: copy

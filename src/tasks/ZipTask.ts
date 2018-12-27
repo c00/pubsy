@@ -32,6 +32,12 @@ export class ZipTask extends Task {
     return null;
   }
 
+  protected setDefaults() {
+    super.setDefaults();
+    //Default to buildpath
+    if (!this.params.cwd && this.environment.buildPath) this.params.cwd = this.environment.buildPath;
+  }
+
   public run(): Promise<any> {
     this.setDefaults();
 

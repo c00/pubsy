@@ -1,6 +1,3 @@
-import { copyFileSync, existsSync, lstatSync } from 'fs';
-import * as glob from 'glob';
-import { basename, dirname } from 'path';
 import * as shelljs from 'shelljs';
 
 import { Task } from '../model/Task';
