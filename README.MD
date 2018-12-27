@@ -82,6 +82,7 @@ environments:
 Every task has a set of properties that exist for all tasks. Tasks also have individual params that make sense for that specific task.
 
 Global params:
+
 | Property | type | default | description | 
 | --- | --- | --- | --- |
 |name | string | | The task name. 
@@ -182,25 +183,11 @@ tasks:
 ### Rollback remote
 
 
-
-
-
-
 ## Todo
-Documentation / Testing
-Error handling could be improved
-Verbosity should be a thing
-Success of exec commands should be checked
-Output default help
-colors and spinners
-A way for custom tasks to be loaded dynamically
-
-# Documentation
-The entire module works off of the yaml file. All tasks are 
-
-## Environments
-An environment has a name and a bunch of optional properties. 
-
-## Tasks
-
-### Settig up the configuration yaml
+- Documentation / Testing
+- Error handling could be improved
+- Verbosity should be a thing
+- Success of exec commands should be checked
+- Output default help
+- colors and spinners
+- A way for custom tasks to be loaded dynamically
