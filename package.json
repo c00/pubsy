@@ -1,20 +1,30 @@
 {
   "name": "pubsy",
   "version": "1.0.0",
-  "description": "Deployment / Publishing library for Angular 2+",
+  "description": "Deployment / Publishing library for Angular 2+ and other things.",
   "main": "bin/index.js",
   "scripts": {
     "build": "tsc --outDir bin",
     "tsw": "tsc --outDir bin -w",
-    "test": "ts-node node_modules/jasmine/bin/jasmine"
+    "test": "ts-node node_modules/jasmine/bin/jasmine",
+    "prepublish": "npm run build"
   },
   "bin": {
     "pubsy": "./bin/index.js"
   },
+  "engines": {
+    "node": ">=8.11.3"
+  },
   "author": "Co van Leeuwen",
   "license": "MIT",
+  "files": [
+    "bin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:c00/pubsy.git"
+  },
   "dependencies": {
-    "@types/bluebird": "^3.5.25",
     "@types/glob": "^7.1.1",
     "@types/js-yaml": "^3.11.4",
     "@types/jszip": "^3.1.4",
