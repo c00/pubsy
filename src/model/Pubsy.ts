@@ -40,7 +40,7 @@ export class Pubsy {
   public run() {
     commander
       .version('0.1.0')
-      .option('-c --config <path>', 'Path to pubsy config file. Defaults to pubsy.yml')
+      .option('-c --config <name>', 'Name or Path to pubsy config file. Names are matched on pubsy-[name].yml. Defaults to pubsy.yml')
       .option('-e --environment <name>', 'Environment name. If no environments are defined, ignore this option.')
       .command('build')
       .action(() => {
@@ -67,11 +67,21 @@ export class Pubsy {
   }
 
   private loadConfig() {
-    const configFile = commander.config || 'pubsy.yml';
-    console.debug("Using configuration file: " + configFile);
+    let configFile = commander.config || 'pubsy.yml';
+    
+    let notFoundFiles = [];
+    //Try matching on path first.
+    if (!existsSync(configFile)) {
+      notFoundFiles.push(configFile);
+
+      //switch to name
+      configFile = `pubsy-${configFile}.yml`;
+    }
 
     if (!existsSync(configFile)) {
-      console.error("Configuration file not found: " + resolve(configFile));
+      notFoundFiles.push(configFile);
+      let names = notFoundFiles.map((f) => resolve(f)).join(', ');
+      console.error("Configuration file not found. Looked for: " + names);
       process.exit(1);
     }
 
@@ -82,6 +92,8 @@ export class Pubsy {
       console.error(ex);
       process.exit(1);
     }
+
+    console.debug("Using configuration file: " + configFile);
   }
 
   private loadEnvironments() {
