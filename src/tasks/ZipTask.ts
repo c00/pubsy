@@ -13,7 +13,6 @@ export class ZipTask extends Task {
 
   protected defaultParams: Partial<ZipTaskParams> = { dest: 'files.zip', createDestFolder: true }
   private _files: string[] = [];
-  private _resolve;
   public params: ZipTaskParams;
 
   private checkParams(): null | string {
@@ -38,24 +37,15 @@ export class ZipTask extends Task {
     if (!this.params.cwd && this.environment.buildPath) this.params.cwd = this.environment.buildPath;
   }
 
-  public run(): Promise<any> {
+  public async run() {
     this.setDefaults();
 
-    return new Promise((res, reject) => {
-      this._resolve = res;
+    //Prepend the buildPath
+    if (this.environment.buildPath) this.params.dest = resolve(this.environment.buildPath + this.params.dest);
 
-      //Prepend the buildPath
-      if (this.environment.buildPath) this.params.dest = resolve(this.environment.buildPath + this.params.dest);
+    const result = this.checkParams();
+    if (result) throw result;
 
-      const result = this.checkParams();
-
-      if (result) reject(result);
-
-      this.runAsync();
-    });
-  }
-
-  private async runAsync() {
     //Change working directory
     if (this.params.cwd) shelljs.cd(this.params.cwd);
 
@@ -64,7 +54,7 @@ export class ZipTask extends Task {
 
     this._files = files.filter(f => excluded.indexOf(f) === -1);
 
-    this.zip();
+    await this.zip();
   }
 
   private async getPaths(pattern: string | string[]) {
@@ -80,7 +70,7 @@ export class ZipTask extends Task {
     return files;
   }
 
-  private globPath(input: string): Promise<string[]> {
+  private async globPath(input: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
       glob(input, (err, result) => {
         if (err) reject(err);
@@ -102,13 +92,15 @@ export class ZipTask extends Task {
       if (!existsSync(dir)) shelljs.mkdir('-p', dir);
     }
 
-    //Write out the zip file.
-    zip
-    .generateNodeStream({ compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true })
-    .pipe(createWriteStream(this.params.dest))
-    .on('finish', () => {
-      console.log(`${this.params.dest} created.`);
-      this._resolve();
+    return new Promise((resolve, reject) => {
+      //Write out the zip file.
+      zip
+        .generateNodeStream({ compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true })
+        .pipe(createWriteStream(this.params.dest))
+        .on('finish', () => {
+          console.log(`${this.params.dest} created.`);
+          resolve();
+        });
     });
   }
 }

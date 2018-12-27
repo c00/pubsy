@@ -1,9 +1,11 @@
-import "jasmine";
-import { CopyTaskParams, CopyTask } from '../../src/tasks/CopyTask';
-import { FileHelper } from '../helpers/FileHelper';
-import { stat, existsSync } from "fs";
+import 'jasmine';
+
+import { existsSync } from 'fs';
+import { mkdir } from 'shelljs';
+
 import { Environment } from '../../src/model/Environment';
-import { mkdir } from "shelljs";
+import { CopyTask, CopyTaskParams } from '../../src/tasks/CopyTask';
+import { FileHelper } from '../helpers/FileHelper';
 
 const defaultParams: CopyTaskParams = {
   source: 'test/assets/**/*',
