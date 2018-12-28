@@ -55,9 +55,10 @@ export class ZipTask extends Task {
     if (result) throw result;
 
     //Change working directory
+    const current = shelljs.pwd() + "";
     if (this.params.cwd) shelljs.cd(this.params.cwd);
-
     this._files = await Helper.glob(this.params.source, this.params.exclude);
+    if (this.params.cwd) shelljs.cd(current);
 
     await this.zip();
   }

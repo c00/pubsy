@@ -87,7 +87,7 @@ Global params:
 | --- | --- | --- | --- |
 |name | string | | The task name. 
 |description | string | Empty string | (optional) Something to describe what's going to happen.
-|label| string | Empty string | Used with the `pubsy run [label]` command.
+|label| string | `null` | (optional) Used with the `pubsy run [label]` command.
 |enabled| boolean | `true` | Set to false to skip this task during a build.
 | params | any | Depends on task | The task specific parameters.
 
@@ -98,8 +98,8 @@ The echo task simply display one or more messages. This task is a great example 
 
 | Property | type | default | description | 
 | --- | --- | --- | --- |
-| message | string | 'Hello Planet!' | The message you want to send.
-| messages | string[] | `null` | If you want to print mutliple messages, use this one instead.
+| message | string | 'Hello Planet!' | (optional) The message you want to send.
+| messages | string[] | `null` | (optional) If you want to print mutliple messages, use this one instead.
 
 #### Example
 ```yaml
@@ -125,7 +125,7 @@ BE CAREFUL AS THIS CAN MESS THINGS UP! FILES WILL BE DELETED! (I may or may not 
 
 | Property | type | default | description | 
 | --- | --- | --- | --- |
-| targets | string / string[] | `null` | The folders to `rm -rf`. 
+| targets | string / string[] |  | The folders to `rm -rf`. 
 
 #### Example
 ```yaml
@@ -145,11 +145,11 @@ The sources cannot be paths starting with `.'`, `../` or `/`, because we need to
 
 | Property | type | default | description | 
 | --- | --- | --- | --- |
-|source| string / string[] | Empty string | The source files/patterns to copy. Supports globbing.
-|cwdSource| string | `null` | Change working directory for the source files.
-|exclude| string / string[] | Empty string | Files / patterns to exclude. Supports globbing.
-|dest| string | Empty string | The destination. This will be prepended with the Environment `buildPath` if available.
-|flatten| boolean | `false` | Don't keep the folder structure.
+|source| string / string[] |  | The source files/patterns to copy. Supports globbing.
+|cwdSource| string | `null` | (optional) Change working directory for the source files.
+|exclude| string / string[] | `null` | (optional) Files / patterns to exclude. Supports globbing.
+|dest| string |  | The destination. This will be prepended with the Environment `buildPath` if available.
+|flatten| boolean | `false` | (optional) Don't keep the folder structure.
 
 #### Example
 ```yaml
@@ -175,6 +175,17 @@ tasks:
 ```
 
 ### Zip files
+Task name: `zip`
+
+Creates a compressed zip file.
+
+| Property | type | default | description | 
+| --- | --- | --- | --- |
+|source| string / string[] |  | The source files/patterns to copy. Supports globbing.
+|cwd| string | `null` | (optional) Change working directory for the source files.
+|exclude| string / string[] | `null` | (optional) Files / patterns to exclude. Supports globbing.
+|dest| string | `files.zip` | (optional) The destination. This will be prepended with the Environment `buildPath` if available. Must end in `.zip`
+
 ### Angular build
 ### Copy to remote
 ### Unzip remote

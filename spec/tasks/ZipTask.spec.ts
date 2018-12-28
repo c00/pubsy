@@ -15,11 +15,6 @@ const defaultParams: CopyTaskParams = {
 };
 const fh = new FileHelper();
 
-/* 
-  cwd?: string;
-
-  prepend buildPath
-   */
 describe("Zip functions", () => {
   const dir = dirname(defaultParams.dest) + "/";
   //Make the dir in case it doesn't exist.
@@ -79,7 +74,6 @@ describe("Zip functions", () => {
 
     let error;
     try {
-      debugger;
       await t.run();
     } catch (e) {
       error = e;
@@ -97,7 +91,6 @@ describe("Zip functions", () => {
     const t = new ZipTask(env, params);
 
     await t.run();
-    debugger;
     expect(existsSync(env.buildPath + params.dest)).toBe(true);
 
 
