@@ -5,6 +5,8 @@ import * as shelljs from 'shelljs';
 import { Task } from '../model/Task';
 import { createWriteStream, readFileSync, lstatSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
+import { Helper } from '../model/Helper';
+import { FileInfo } from '../model/FileInfo';
 
 
 
@@ -12,7 +14,7 @@ export class ZipTask extends Task {
   name = 'zip';
 
   protected defaultParams: Partial<ZipTaskParams> = { dest: 'files.zip', createDestFolder: true }
-  private _files: string[] = [];
+  private _files: FileInfo[] = [];
   public params: ZipTaskParams;
 
   private checkParams(): null | string {
@@ -27,6 +29,12 @@ export class ZipTask extends Task {
         return "Sources cannot start with '/', './' or '../'. Use cwd to change the working directory.";
       }
     }
+
+    //Check end of destination to be.zip
+    if (this.params.dest.substring(this.params.dest.length - 4) !== '.zip') return "Destination must end in '.zip'";
+
+    //Check if the folder exists
+    if (!this.params.createDestFolder && !existsSync(dirname(this.params.dest))) return "Zip destination folder doesn't exist.";
 
     return null;
   }
@@ -49,41 +57,16 @@ export class ZipTask extends Task {
     //Change working directory
     if (this.params.cwd) shelljs.cd(this.params.cwd);
 
-    const files = await this.getPaths(this.params.source);
-    const excluded = await this.getPaths(this.params.exclude);
-
-    this._files = files.filter(f => excluded.indexOf(f) === -1);
+    this._files = await Helper.glob(this.params.source, this.params.exclude);
 
     await this.zip();
-  }
-
-  private async getPaths(pattern: string | string[]) {
-    if (!pattern) return [];
-    if (typeof pattern === 'string') pattern = [pattern];
-
-    let files = [];
-    for (let s of pattern) {
-      const batch = await this.globPath(s);
-      files.push.apply(files, batch);
-    }
-
-    return files;
-  }
-
-  private async globPath(input: string): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      glob(input, (err, result) => {
-        if (err) reject(err);
-        resolve(result);
-      });
-    });
   }
 
   private zip() {
     let zip = new JSZip();
 
     for (let f of this._files) {
-      if (lstatSync(f).isFile()) zip.file(f, readFileSync(f));
+      if (lstatSync(f.resolved).isFile()) zip.file(f.relative, readFileSync(f.resolved));
     }
 
     //Create folder if we need to.
@@ -109,6 +92,6 @@ export interface ZipTaskParams {
   source: string | string[];
   exclude?: string | string[];
   createDestFolder?: boolean;
-  dest: string;
+  dest?: string;
   cwd?: string;
 }

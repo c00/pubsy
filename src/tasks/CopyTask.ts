@@ -3,6 +3,8 @@ import * as glob from 'glob';
 import { basename, dirname, resolve } from 'path';
 import * as shelljs from 'shelljs';
 
+import { FileInfo } from '../model/FileInfo';
+import { Helper } from '../model/Helper';
 import { Task } from '../model/Task';
 
 
@@ -50,18 +52,7 @@ export class CopyTask extends Task {
     if (this.params.cwdSource) shelljs.cd(this.params.cwdSource);
 
     //Glob the source files.
-    const files = await this.getPaths(this.params.source);
-    const excluded = await this.getPaths(this.params.exclude);
-
-    this._files = files
-      .filter(f => excluded.indexOf(f) === -1)
-      .map(f => {
-        return {
-          relative: f,
-          resolved: resolve(f),
-          basename: basename(f)
-        }
-      });
+    this._files = await Helper.glob(this.params.source, this.params.exclude);
 
     //Change working directory for Destination
     shelljs.cd(this.originalWorkingDir);
@@ -84,33 +75,10 @@ export class CopyTask extends Task {
       //Copy files
       if (lstatSync(f.resolved).isFile()) copyFileSync(f.resolved, dest);
 
-      //console.debug(`Copy: ${f.resolved} --> ${dest}`);
-      
+      //console.debug(`Copy: ${f.resolved} --> ${dest}`); 
     }
 
     console.log(this._files.length + " files copied.");
-  }
-
-  private async getPaths(pattern: string | string[]) {
-    if (!pattern) return [];
-    if (typeof pattern === 'string') pattern = [pattern];
-
-    let files = [];
-    for (let s of pattern) {
-      const batch = await this.globPath(s);
-      files.push.apply(files, batch);
-    }
-
-    return files;
-  }
-
-  private globPath(input: string): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      glob(input, (err, result) => {
-        if (err) reject(err);
-        resolve(result);
-      });
-    });
   }
 
   private getDest(source: string, destPath: string) {
@@ -129,10 +97,4 @@ export interface CopyTaskParams {
   dest: string;
   flatten?: boolean;
   cwdSource?: string;
-}
-
-export interface FileInfo {
-  relative: string;
-  resolved: string;
-  basename: string;
 }
