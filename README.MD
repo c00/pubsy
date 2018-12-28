@@ -201,6 +201,26 @@ tasks:
 ```
 
 ### Angular build
+Task name: `ngBuild`
+
+Create an angular build using the `ng` command line tool. 
+
+| Property | type | default | description | 
+| --- | --- | --- | --- |
+|base| string | `/` | (optional) The base element (`<base href="/">`)
+|cwd| string | Empty string` | (optional) The directory where the angular project is.
+|dest| string | `dist/` | (optional) The destination. This will be prepended with the Environment `buildPath` if available.
+
+#### Example
+```yaml
+  - name: ngBuild
+    description: 'Building Angular App'
+    params: 
+      base: /my-folder/
+      dest: .build/ng/public/
+      cwd: /path/to/angular/app
+```
+
 ### Copy to remote
 ### Unzip remote
 ### Symlink remote

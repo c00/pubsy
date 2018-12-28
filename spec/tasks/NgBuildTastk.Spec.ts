@@ -13,6 +13,9 @@ const defaultParams: NgBuildTaskParams = {
   cwd: '/home/coo/dev/www/log-viewer-2/log-viewer-2-front/'
 };
 const fh = new FileHelper();
+/* todo
+What happens if the cwd is wrong?
+ */
 
 describe("Build an angular project", () => {
   const current = shelljs.pwd();
