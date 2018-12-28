@@ -15,10 +15,13 @@ tasks:
       dest: 'test/.test-files/'
     enabled: false
   - name: ngBuild
+    label: ng
     description: 'Building Angular App'
     params: 
       base: /
-    enabled: false
+      cwd: /home/coo/dev/www/log-viewer-2/log-viewer-2-front/
+      dest: ng/
+    enabled: true
   - name: echo
     description: 'Sir mixalot speaks'
     params: 
@@ -33,8 +36,8 @@ tasks:
       message: "Yup. Testing string values: %name%"
 environments:
   - name: local
-    buildPath: .build/intermediate/
-    deployPath: .build/deployed
+    buildPath: test/.build/intermediate/
+    deployPath: test/.build/deployed
     default: true
   - name: bessy
     isRemote: true

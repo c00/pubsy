@@ -91,10 +91,6 @@ export class Pubsy {
     });
 
     commander.parse(process.argv);
-
-    if (commander.verbose) Log.verbosity = Log.level.EXTRA_DEBUG;
-
-
   }
 
   private loadConfig() {
@@ -203,7 +199,6 @@ export class Pubsy {
 
   private async runTask(label: string) {
     for (let e of this.environments) {
-      Log.info(`Running tasks with label '${label}' on environment: ${e.name}`);
 
       for (let t of e.taskList) {
         if (t.label !== label) continue;
