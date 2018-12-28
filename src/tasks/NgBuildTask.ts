@@ -1,33 +1,39 @@
-import { exec } from 'child_process';
+import { execSync } from 'child_process';
+import * as path from 'path';
+import * as shelljs from 'shelljs';
 
+import { Log } from '../model/Log';
 import { Task } from '../model/Task';
-import { Helper } from '../model/Helper';
 
 export class NgBuildTask extends Task {
   name = 'ngBuild';
-  protected defaultParams: NgBuildTaskOptions = {
+  protected defaultParams: NgBuildTaskParams = {
     base: '/',
-    output: ''
+    dest: ''
   };
-  params: NgBuildTaskOptions;
+  params: NgBuildTaskParams;
 
-  public run() {
+  public async run() {
     this.setDefaults();
-    
-    return new Promise((resolve, reject) => {
-      //Prepend the buildPath
-      if (this.environment.buildPath) this.params.output = this.environment.buildPath + this.params.output;
-      
-      exec(`ng build --output-path "${this.params.output}" --base-href ${this.params.base} --prod`, (err) => {
-        if (err) reject(err);
 
-        resolve();
-      });
-    });
-  }
+    //Prepend the buildPath
+    if (this.environment.buildPath) this.params.dest = this.environment.buildPath + this.params.dest;
+    this.params.dest = path.resolve(this.params.dest);
+
+    if (this.params.cwd) {
+      Log.debug("  Switching to " + this.params.cwd)
+      shelljs.cd(this.params.cwd);
+    }
+
+    const cmd = `ng build --output-path "${this.params.dest}" --base-href "${this.params.base}" --prod`;
+    Log.debug("  Running: " + cmd);
+    execSync(cmd, { stdio: 'inherit' });
+
+  } 
 }
 
-export interface NgBuildTaskOptions {
-  base: string;
-  output: string;
+export interface NgBuildTaskParams {
+  base?: string;
+  dest?: string;
+  cwd?: string;
 }

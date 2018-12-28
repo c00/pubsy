@@ -47,7 +47,6 @@ export namespace Log {
 
     const c = stringColors[level] || null;
     if (c) {
-      debugger;
       for (let p of params) {
         converted.push((typeof p === 'string') ? colors[c](p) : p);
       }

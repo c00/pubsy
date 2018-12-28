@@ -15,7 +15,7 @@ const fh = new FileHelper();
 
 describe("Copy functions", () => {
   //Make the dir in case it doesn't exist.
-  mkdir(defaultParams.dest);
+  if (!existsSync(defaultParams.dest)) mkdir(defaultParams.dest);
 
   it("Copy all files", async (done) => {
     fh.rimraf(defaultParams.dest + "*");
