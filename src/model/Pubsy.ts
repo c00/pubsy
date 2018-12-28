@@ -11,12 +11,13 @@ import { EchoTask } from '../tasks/EchoTask';
 import { NgBuildTask } from '../tasks/NgBuildTask';
 import { RmTask } from '../tasks/RmTask';
 import { RollbackRemoteTask, RollbackRemoteTaskOptions } from '../tasks/RollbackRemoteTask';
+import { SymlinkRemoteTask } from '../tasks/SymlinkRemoteTask';
 import { UnzipTask } from '../tasks/UnzipTask';
 import { ZipTask } from '../tasks/ZipTask';
 import { Config } from './Config';
 import { Environment } from './Environment';
+import { Log } from './Log';
 import { SshManager } from './SshManager';
-import { SymlinkRemoteTask } from '../tasks/SymlinkRemoteTask';
 
 export class Pubsy {
   private taskList = {
@@ -32,6 +33,7 @@ export class Pubsy {
     symlinkRemote: SymlinkRemoteTask,
   };
 
+  private yamlFile: string;
   private config: Config;
   private environments: Environment[] = [];
 
@@ -39,15 +41,30 @@ export class Pubsy {
     this.taskList[name] = type;
   }
 
+  private logSummary(firstLine: string) {
+    Log.success(`\n${firstLine}`);
+    Log.success(`  on Environment ${this.environments[0].name}`);
+    Log.success(`  using ${this.yamlFile}`);
+    Log.debug("Full path: " + resolve(this.yamlFile));
+    Log.success("");
+  }
+
   public run() {
     commander
       .version('0.1.0')
       .option('-c --config <name>', 'Name or Path to pubsy config file. Names are matched on pubsy-[name].yml. Defaults to pubsy.yml')
       .option('-e --environment <name>', 'Environment name. If no environments are defined, ignore this option.')
-      .command('build')
+      .option('-v --verbose', 'More output than usual.');
+
+    commander.on('option:verbose', () => {
+      if (commander.verbose) Log.verbosity = Log.level.EXTRA_DEBUG;
+    });
+
+    commander.command('build')
       .action(() => {
         this.loadConfig();
         this.loadEnvironments();
+        this.logSummary('Running build')
         this.runTasks();
       });
 
@@ -55,6 +72,7 @@ export class Pubsy {
       .action((label: string) => {
         this.loadConfig();
         this.loadEnvironments();
+        this.logSummary(`Running tasks with label ${label}`);
         this.runTask(label);
       });
 
@@ -62,15 +80,26 @@ export class Pubsy {
       .action((amountOrBuildId: string) => {
         this.loadConfig();
         this.loadEnvironments();
-        this.rollback(amountOrBuildId)        
+        this.logSummary(`Rolling back deployment`);
+        this.rollback(amountOrBuildId);
       });
 
+    // error on unknown commands
+    commander.on('command:*', () => {
+      Log.warning('Invalid command: %s\nSee --help for a list of available commands.', commander.args.join(' '));
+      process.exit(1);
+    });
+
     commander.parse(process.argv);
+
+    if (commander.verbose) Log.verbosity = Log.level.EXTRA_DEBUG;
+
+
   }
 
   private loadConfig() {
     let configFile = commander.config || 'pubsy.yml';
-    
+
     let notFoundFiles = [];
     //Try matching on path first.
     if (!existsSync(configFile)) {
@@ -83,19 +112,19 @@ export class Pubsy {
     if (!existsSync(configFile)) {
       notFoundFiles.push(configFile);
       let names = notFoundFiles.map((f) => resolve(f)).join(', ');
-      console.error("Configuration file not found. Looked for: " + names);
+      Log.error("Configuration file not found. Looked for: " + names);
       process.exit(1);
     }
 
     try {
       this.config = yaml.safeLoad(readFileSync(configFile, 'utf8'));
     } catch (ex) {
-      console.error("Error loading config file: " + configFile);
-      console.error(ex);
+      Log.error("Error loading config file: " + configFile);
+      Log.error(ex);
       process.exit(1);
     }
 
-    console.debug("Using configuration file: " + configFile);
+    this.yamlFile = configFile;
   }
 
   private loadEnvironments() {
@@ -124,7 +153,7 @@ export class Pubsy {
       this.loadTasks(defaultEnv);
       this.environments.push(defaultEnv);
     } else {
-      console.error("No environment chosen. Set a default Environment, or use the --environment flag");
+      Log.error("No environment chosen. Set a default Environment, or use the --environment flag");
       process.exit(1);
     }
   }
@@ -137,7 +166,7 @@ export class Pubsy {
       if (t.enabled === false) continue;
 
       if (!this.taskList[t.name]) {
-        console.error("Unknown task " + t.name);
+        Log.error("Unknown task " + t.name);
         process.exit(1);
       }
       const task = new this.taskList[t.name](e, t.params);
@@ -151,18 +180,17 @@ export class Pubsy {
     const wd = resolve(shelljs.pwd() + "");
 
     for (let e of this.environments) {
-      console.log("Running task set on environment: " + e.name);
 
       for (let t of e.taskList) {
         //Reset working directory
         shelljs.cd(wd);
 
         try {
-          console.log(`### TASK: ${t.description} ###`);
+          Log.info(`### TASK: ${t.description} ###`);
           await t.run();
         } catch (ex) {
-          console.error(`Error while running ${t.name}: ${t.description}`)
-          console.dir(t);
+          Log.error(`Error while running ${t.name}: ${t.description}`)
+          Log.error(t);
           throw ex;
         }
 
@@ -170,22 +198,22 @@ export class Pubsy {
       e.remote.dispose();
     }
 
-    console.log("Pubsy done!");
+    Log.success("Pubsy done!");
   }
 
   private async runTask(label: string) {
     for (let e of this.environments) {
-      console.log(`Running tasks with label '${label}' on environment: ${e.name}`);
+      Log.info(`Running tasks with label '${label}' on environment: ${e.name}`);
 
       for (let t of e.taskList) {
         if (t.label !== label) continue;
 
         try {
-          console.log(`### TASK: ${t.description} ###`);
+          Log.info(`### TASK: ${t.description} ###`);
           await t.run();
         } catch (ex) {
-          console.error(`Error while running ${t.name}: ${t.description}`)
-          console.dir(t);
+          Log.error(`Error while running ${t.name}: ${t.description}`)
+          Log.error(t);
           throw ex;
         }
 
@@ -194,7 +222,7 @@ export class Pubsy {
       e.remote.dispose();
     }
 
-    console.log("Pubsy done!");
+    Log.success("Pubsy done!");
     process.exit(0);
   }
 
@@ -202,7 +230,7 @@ export class Pubsy {
     if (!amountOrBuildId) amountOrBuildId = 1;
 
     let params: RollbackRemoteTaskOptions = {};
-    if (isNaN(amountOrBuildId) ){
+    if (isNaN(amountOrBuildId)) {
       params.buildId = amountOrBuildId;
     } else {
       params.amount = amountOrBuildId;
@@ -211,14 +239,14 @@ export class Pubsy {
     for (let e of this.environments) {
       const task = new RollbackRemoteTask(e, params);
       try {
-        console.log("Handling environment " + e.name);
+        Log.info("Handling environment " + e.name);
         await task.run();
       } catch (error) {
-        console.warn('Rollback failed for environment ' + e.name);
+        Log.warning('Rollback failed for environment ' + e.name);
       }
-    
+
       e.remote.dispose();
     }
-    
+
   }
 }

@@ -1,4 +1,5 @@
 import { Task } from '../model/Task';
+import { Helper } from '../model/Helper';
 
 export class EchoTask extends Task {
   name = 'echo';
@@ -13,10 +14,10 @@ export class EchoTask extends Task {
     
     if (this.params.messages) {
       for (let m of this.params.messages){
-        console.log(m);
+        console.log(Helper.interpolateString(m, this.environment));
       }
     } else {
-      console.log(this.params.message);
+      console.log(Helper.interpolateString(this.params.message, this.environment));
     }
     
   }

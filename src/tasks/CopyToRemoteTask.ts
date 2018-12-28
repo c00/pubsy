@@ -2,6 +2,7 @@ import * as glob from 'glob';
 import { dirname } from 'path';
 import * as shelljs from 'shelljs';
 
+import { Log } from '../model/Log';
 import { Task } from '../model/Task';
 
 
@@ -42,7 +43,7 @@ export class CopyToRemoteTask extends Task {
 
       //Prepend the buildPath
       if (this.environment.deployPath) this.params.dest = this.environment.deployPath + this.params.dest;
-      console.debug(this.params.dest);
+      Log.debug("  Destination: " + this.params.dest);
       const result = this.checkParams();      
 
       if (result) return reject(result);
@@ -97,7 +98,7 @@ export class CopyToRemoteTask extends Task {
       //Copy files
       await this.environment.remote.putFile(f, dest);      
     }
-    console.log(this._files.length + " files copied.");
+    Log.info("  " + this._files.length + " files copied.");
     this._resolve();
   }
 

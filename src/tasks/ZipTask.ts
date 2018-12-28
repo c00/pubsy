@@ -1,14 +1,12 @@
-import * as glob from 'glob';
+import { createWriteStream, existsSync, lstatSync, readFileSync } from 'fs';
 import * as JSZip from 'jszip';
+import { dirname, resolve } from 'path';
 import * as shelljs from 'shelljs';
 
-import { Task } from '../model/Task';
-import { createWriteStream, readFileSync, lstatSync, existsSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { Helper } from '../model/Helper';
 import { FileInfo } from '../model/FileInfo';
-
-
+import { Helper } from '../model/Helper';
+import { Log } from '../model/Log';
+import { Task } from '../model/Task';
 
 export class ZipTask extends Task {
   name = 'zip';
@@ -82,7 +80,7 @@ export class ZipTask extends Task {
         .generateNodeStream({ compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true })
         .pipe(createWriteStream(this.params.dest))
         .on('finish', () => {
-          console.log(`${this.params.dest} created.`);
+          Log.debug(`${this.params.dest} created.`);
           resolve();
         });
     });

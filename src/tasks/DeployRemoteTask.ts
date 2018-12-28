@@ -1,11 +1,12 @@
 import * as moment from 'moment';
+import * as shelljs from 'shelljs';
 
+import { Log } from '../model/Log';
 import { Task } from '../model/Task';
 import { CopyToRemoteTask } from './CopyToRemoteTask';
+import { SymlinkRemoteTask } from './SymlinkRemoteTask';
 import { UnzipTask } from './UnzipTask';
 import { ZipTask } from './ZipTask';
-import * as shelljs from 'shelljs';
-import { SymlinkRemoteTask } from './SymlinkRemoteTask';
 
 export class DeployRemoteTask extends Task {
   name = 'deployRemote';
@@ -38,15 +39,15 @@ export class DeployRemoteTask extends Task {
     tasks.push(new SymlinkRemoteTask(this.environment, { source: buildId, dest: this.environment.deployPath + 'current' }, "Linking new build..."));
 
     for (let t of tasks) {
-      console.log(t.description);
+      Log.info("  " + t.description);
       shelljs.cd(wd);
       await t.run();
     }
 
-    console.log("Cleaning up old deployments...");
+    Log.info("  Cleaning up old deployments...");
     await this.cleanOldDeployments();
 
-    console.log(`Deployed successfully! Id: ${buildId}!`);
+    Log.success(`  Deployed successfully! Id: ${buildId}!`);
   }
 
   private async cleanOldDeployments() {
@@ -57,12 +58,12 @@ export class DeployRemoteTask extends Task {
     const list = result.split('\n').filter(s => s.startsWith('build-')).sort();
 
     if (list.length > amount) {
-      console.debug("Removing old deployments");
+      Log.debug("Removing old deployments");
       const toRemove = list.length - amount;
       const folders = list.slice(0, toRemove);
 
       for (let f of folders) {
-        console.debug("Removing " + f);
+        Log.debug("Removing " + f);
         await this.environment.remote.exec('rm', ['-rf', this.environment.deployPath + f])
       }
     }

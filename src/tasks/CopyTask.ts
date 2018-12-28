@@ -1,10 +1,10 @@
 import { copyFileSync, existsSync, lstatSync } from 'fs';
-import * as glob from 'glob';
-import { basename, dirname, resolve } from 'path';
+import { basename, dirname } from 'path';
 import * as shelljs from 'shelljs';
 
 import { FileInfo } from '../model/FileInfo';
 import { Helper } from '../model/Helper';
+import { Log } from '../model/Log';
 import { Task } from '../model/Task';
 
 
@@ -75,10 +75,10 @@ export class CopyTask extends Task {
       //Copy files
       if (lstatSync(f.resolved).isFile()) copyFileSync(f.resolved, dest);
 
-      //console.debug(`Copy: ${f.resolved} --> ${dest}`); 
+      Log.extraDebug(`  Copy: ${f.resolved} --> ${dest}`); 
     }
 
-    console.log(this._files.length + " files copied.");
+    Log.info("  " + this._files.length + " files copied.");
   }
 
   private getDest(source: string, destPath: string) {

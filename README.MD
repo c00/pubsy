@@ -94,7 +94,9 @@ Global params:
 ### Echo
 Task name: `echo`
 
-The echo task simply display one or more messages. This task is a great example of how to make your own tasks, or if you feel like adding one or more messages in between.
+The echo task simply display one or more messages. You can use variables from the environment in your messages by encasing them in `%`. For example `%name%` will print the environment name (if available). 
+
+This task is a good starting point for how to make your own tasks.
 
 | Property | type | default | description | 
 | --- | --- | --- | --- |
@@ -113,9 +115,9 @@ tasks:
         - I need you now
         - To hold my hand
   - name: echo
-    description: The same task twice?
+    description: Which environment is this?
     params:
-      message: Yup. 
+      message: "It is %name%. The buildpath is %buildPath%"
 ```
 
 ### Remove files
@@ -186,6 +188,18 @@ Creates a compressed zip file.
 |exclude| string / string[] | `null` | (optional) Files / patterns to exclude. Supports globbing.
 |dest| string | `files.zip` | (optional) The destination. This will be prepended with the Environment `buildPath` if available. Must end in `.zip`
 
+#### Example
+```yaml
+tasks:
+  - name: zip
+    description: Compressing files
+    label: zipTest
+    params: 
+      cwd: test/assets
+      source: '**/*'
+      dest: 'testFiles.zip'
+```
+
 ### Angular build
 ### Copy to remote
 ### Unzip remote
@@ -197,8 +211,6 @@ Creates a compressed zip file.
 ## Todo
 - Documentation / Testing
 - Error handling could be improved
-- Verbosity should be a thing
 - Success of exec commands should be checked
-- Output default help
-- colors and spinners
+- spinners
 - A way for custom tasks to be loaded dynamically

@@ -8,6 +8,23 @@ export class Helper {
     return subject.split(find).join(replace);
   }
 
+  public static interpolateString(subject: string, values?: any): string {
+    if (!values) return subject;
+
+    let result: string = subject;
+
+    for (let k in values) {
+      if (!values.hasOwnProperty(k)) continue;
+      if (typeof values[k] !== 'string') continue;
+
+      const placeholder = `%${k}%`;
+      result = Helper.replaceAll(result, placeholder, values[k]);
+    }
+
+    return result;
+    
+  }
+
   public static trimTrailingSlash(s: string): string {
     debugger;
     let i = 0;

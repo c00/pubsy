@@ -1,6 +1,6 @@
 tasks: 
   - name: zip
-    description: Create zil file from test build.
+    description: Create zip file from test build.
     label: zipTest
     params: 
       cwd: test/assets

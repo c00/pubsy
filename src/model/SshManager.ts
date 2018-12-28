@@ -1,7 +1,9 @@
-import { Environment } from './Environment';
 import SSH = require('node-ssh');
-import * as username from 'username';
 import { basename } from 'path';
+import * as username from 'username';
+
+import { Environment } from './Environment';
+import { Log } from './Log';
 
 export class SshManager {
   private connected = false;
@@ -22,7 +24,7 @@ export class SshManager {
 
     if (!this.env.isRemote || !this.env.host) Promise.reject("Environments isn't remote or host is missing");
 
-    console.debug("Connecting to remote...");
+    Log.debug("Connecting to remote...");
     
     this.ssh = new SSH();
     let config = {
@@ -39,14 +41,14 @@ export class SshManager {
   }
 
   public putFile(local: string, remote: string): Promise<any> {
-    console.debug("Putting file: " + basename(remote), local, remote);
+    Log.debug("Putting file: " + basename(remote), local, remote);
     return this.connect()
     .then(() => this.ssh.putFile(local, remote) );
   }
 
   public exec(command: string, params?: string[], options?: any): Promise<string> {
     if (!params) params = [];
-    console.debug(`Exec: ${command} ${params.join(' ')}`)
+    Log.debug(`Exec: ${command} ${params.join(' ')}`)
     return this.connect()
     .then(() => this.ssh.exec(command, params, options) );
   }
@@ -64,7 +66,7 @@ export class SshManager {
       if (removeFileAfter) return this.exec('rm', [file]);
     })
     .catch((err) => {
-      console.error(err);
+      Log.error(err);
       process.exit(1);
     });
   }
@@ -76,7 +78,7 @@ export class SshManager {
 
   public dispose() {
     if (this.ssh) {
-      console.debug("Disconnecting from remote.");
+      Log.debug("Disconnecting from remote.");
       this.ssh.dispose();
     }
   }

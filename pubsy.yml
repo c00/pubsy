@@ -26,10 +26,11 @@ tasks:
         - I like big butts
         - And I cannot lie
         - All you other brothers can't deny
+        - "Environment name: %name%"
   - name: echo
     description: The same task twice?
     params:
-      message: Yup.
+      message: "Yup. Testing string values: %name%"
 environments:
   - name: local
     buildPath: .build/intermediate/
