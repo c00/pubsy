@@ -4,6 +4,7 @@ import * as shelljs from 'shelljs';
 
 import { Log } from '../model/Log';
 import { Task } from '../model/Task';
+import { existsSync } from 'fs';
 
 export class NgBuildTask extends Task {
   name = 'ngBuild';
@@ -21,6 +22,7 @@ export class NgBuildTask extends Task {
     this.params.dest = path.resolve(this.params.dest);
 
     if (this.params.cwd) {
+      if (!existsSync(this.params.cwd)) throw "Angular project path doesn't exist: " + this.params.cwd;
       Log.debug("  Switching to " + this.params.cwd)
       shelljs.cd(this.params.cwd);
     }
