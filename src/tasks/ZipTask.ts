@@ -80,7 +80,7 @@ export class ZipTask extends Task {
         .generateNodeStream({ compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true })
         .pipe(createWriteStream(this.params.dest))
         .on('finish', () => {
-          Log.debug(`${this.params.dest} created.`);
+          Log.debug(`  ${this.params.dest} created.`);
           resolve();
         });
     });

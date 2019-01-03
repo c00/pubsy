@@ -1,4 +1,5 @@
 node_modules
 /bin
 /test/.test-files
-.build
+/test/.*
+pubsy-remote-test.yml

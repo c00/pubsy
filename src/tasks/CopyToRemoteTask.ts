@@ -1,7 +1,8 @@
-import * as glob from 'glob';
 import { dirname } from 'path';
 import * as shelljs from 'shelljs';
 
+import { FileInfo } from '../model/FileInfo';
+import { Helper } from '../model/Helper';
 import { Log } from '../model/Log';
 import { Task } from '../model/Task';
 
@@ -9,12 +10,18 @@ import { Task } from '../model/Task';
 export class CopyToRemoteTask extends Task {
   name = 'copyToRemote';
 
-  protected defaultParams: Partial<CopyTaskParams> = { dest: '' }
-  private _files: string[] = [];
-  private _resolve;
-  public params: CopyTaskParams;
+  protected defaultParams: Partial<CopyToRemoteTaskParams> = { dest: '' }
+  private _files: FileInfo[] = [];
+  public params: CopyToRemoteTaskParams;
 
-  private checkParams(): null|string {
+  protected setDefaults() {
+    super.setDefaults();
+
+    //Prepend the buildPath
+    if (this.environment.deployPath) this.params.dest = this.environment.deployPath + this.params.dest;
+  }
+
+  private checkParams(): null | string {
     if (!this.params.source || !this.params.dest) {
       return "I need a source and dest for this task (CopyToRemoteTask)";
     }
@@ -35,84 +42,48 @@ export class CopyToRemoteTask extends Task {
     return null;
   }
 
-  public run(): Promise<any> {
-    this.setDefaults();    
+  public async run(): Promise<any> {
+    this.setDefaults();
 
-    return new Promise((resolve, reject) => {
-      this._resolve = resolve;
+    Log.debug("  Destination: " + this.params.dest);
+    const result = this.checkParams();
 
-      //Prepend the buildPath
-      if (this.environment.deployPath) this.params.dest = this.environment.deployPath + this.params.dest;
-      Log.debug("  Destination: " + this.params.dest);
-      const result = this.checkParams();      
+    if (result) throw result;
 
-      if (result) return reject(result);
-
-      this.runAsync();
-    });
-  }
-
-  private async runAsync() {
     //Change working directory
     if (this.params.cwd) shelljs.cd(this.params.cwd);
 
-    const files = await this.getPaths(this.params.source);
-    const excluded = await this.getPaths(this.params.exclude);
+    //Glob the source files.
+    this._files = await Helper.glob(this.params.source, this.params.exclude);
 
-    this._files = files.filter(f => excluded.indexOf(f) === -1);
-
-    this.copy();
-  }
-
-  private async getPaths(pattern: string | string[]) {
-    if (!pattern) return [];
-    if (typeof pattern === 'string') pattern = [pattern];
-
-    let files = [];
-    for (let s of pattern) {
-      const batch = await this.globPath(s);
-      files.push.apply(files, batch);
-    }
-
-    return files;
-  }
-
-  private globPath(input: string): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      glob(input, (err, result) => {
-        if (err) reject(err);
-        resolve(result);
-      });
-    });
+    await this.copy();
   }
 
   private async copy() {
     for (let f of this._files) {
       //Get destination directory
-      const dest = this.getDest(f, this.params.dest);
+      const dest = this.getDest(f.relative, this.params.dest);
 
       //Make dir if necessary
       const destPath = dirname(dest);
       await this.environment.remote.mkdir(destPath);
-      
+
       //Copy files
-      await this.environment.remote.putFile(f, dest);      
+      await this.environment.remote.putFile(f.relative, dest);
     }
     Log.info("  " + this._files.length + " files copied.");
-    this._resolve();
   }
 
   private getDest(source: string, destPath: string) {
-    
     if (destPath.substring(destPath.length - 1) !== '/') destPath += '/';
 
     return destPath + source;
   }
 }
 
-export interface CopyTaskParams {
+export interface CopyToRemoteTaskParams {
   source: string | string[];
   exclude?: string | string[];
-  dest: string;
+  dest?: string;
   cwd?: string;
 }

@@ -23,7 +23,7 @@ All building can be done locally, to avoid your server having to build / minify 
 npm i -g pubsy
 ```
 
-## Basic usage
+## Basic usage (command line)
 ```bash
 # Build and deploy based on `pubsy.yml` in the current folder.
 pubsy build
@@ -39,6 +39,19 @@ pubsy run ngbuild
 
 # See help output
 pubsy -h
+```
+
+## Basic usage (API)
+
+```ts
+//All params are optional. Same params can be used as for the command line, except for -h and -v.
+const params = {
+  config: 'my-environment', //Use config `pubsy-my-environment.yml` in the current folder.
+  environment: 'local', //User environment definition named 'local' in config file
+}
+let p = new Pubsy(params);
+//To execute a build
+p.build();
 ```
 
 ## Environments
@@ -90,6 +103,8 @@ Global params:
 |label| string | `null` | (optional) Used with the `pubsy run [label]` command.
 |enabled| boolean | `true` | Set to false to skip this task during a build.
 | params | any | Depends on task | The task specific parameters.
+
+Some tasks are remote tasks. Those are tasks executed over SSH. For them to work, they need the remote settings in the environment to be set.
 
 ### Echo
 Task name: `echo`
@@ -221,7 +236,12 @@ Create an angular build using the `ng` command line tool.
       cwd: /path/to/angular/app
 ```
 
+
+
 ### Copy to remote
+
+
+
 ### Unzip remote
 ### Symlink remote
 ### Deploy remote

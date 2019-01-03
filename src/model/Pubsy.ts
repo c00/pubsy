@@ -34,8 +34,25 @@ export class Pubsy {
   };
 
   private yamlFile: string;
-  private config: Config;
   private environments: Environment[] = [];
+  
+  public config: Config;
+
+  constructor(flags?: any) {
+    //Set manual flags for consumption through the API
+    if (flags) {
+      for (let k in flags) {
+        if (flags.hasOwnProperty(k)) commander[k] = flags[k];
+      }
+
+      if (flags.config) {
+        this.loadConfig();
+        this.loadEnvironments();
+      }
+    }
+  }
+
+  public load
 
   public registerTask(name: string, type) {
     this.taskList[name] = type;
@@ -49,7 +66,7 @@ export class Pubsy {
     Log.success("");
   }
 
-  public run() {
+  public fromCli() {
     commander
       .version('0.1.0')
       .option('-c --config <name>', 'Name or Path to pubsy config file. Names are matched on pubsy-[name].yml. Defaults to pubsy.yml')
@@ -61,28 +78,13 @@ export class Pubsy {
     });
 
     commander.command('build')
-      .action(() => {
-        this.loadConfig();
-        this.loadEnvironments();
-        this.logSummary('Running build')
-        this.runTasks();
-      });
+      .action(() => { this.build(); });
 
     commander.command('run <label>')
-      .action((label: string) => {
-        this.loadConfig();
-        this.loadEnvironments();
-        this.logSummary(`Running tasks with label ${label}`);
-        this.runTask(label);
-      });
+      .action((label: string) => { this.run(label); });
 
     commander.command('rollback [amountOrBuildId]')
-      .action((amountOrBuildId: string) => {
-        this.loadConfig();
-        this.loadEnvironments();
-        this.logSummary(`Rolling back deployment`);
-        this.rollback(amountOrBuildId);
-      });
+      .action((amountOrBuildId: string) => { this.rollback(amountOrBuildId); });
 
     // error on unknown commands
     commander.on('command:*', () => {
@@ -93,7 +95,31 @@ export class Pubsy {
     commander.parse(process.argv);
   }
 
-  private loadConfig() {
+  /* Public commands */
+  public async build() {
+    this.loadConfig();
+    this.loadEnvironments();
+    this.logSummary('Running build')
+    await this.runTasks();
+  }
+
+  public async run(label: string) {
+    this.loadConfig();
+    this.loadEnvironments();
+    this.logSummary(`Running tasks with label ${label}`);
+    await this.runTask(label);
+  }
+
+  public async rollback(amountOrBuildId: string) {
+    this.loadConfig();
+    this.loadEnvironments();
+    this.logSummary(`Rolling back deployment`);
+    await this.doRollback(amountOrBuildId);
+  }
+  /* End public commands */
+
+
+  public loadConfig() {
     let configFile = commander.config || 'pubsy.yml';
 
     let notFoundFiles = [];
@@ -123,7 +149,7 @@ export class Pubsy {
     this.yamlFile = configFile;
   }
 
-  private loadEnvironments() {
+  public loadEnvironments() {
     //If no environments are defined, we just create a default one and use that
     //If at least 1 env is defined
     //   And we have a -e, we use that one.
@@ -221,7 +247,7 @@ export class Pubsy {
     process.exit(0);
   }
 
-  private async rollback(amountOrBuildId?) {
+  private async doRollback(amountOrBuildId?) {
     if (!amountOrBuildId) amountOrBuildId = 1;
 
     let params: RollbackRemoteTaskOptions = {};
