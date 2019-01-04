@@ -46,7 +46,6 @@ export class CopyToRemoteTask extends Task {
   public async run(): Promise<any> {
     this.setDefaults();
 
-    debugger;
     Log.debug("  Destination: " + this.params.dest);
     const result = this.checkParams();
 
@@ -58,7 +57,6 @@ export class CopyToRemoteTask extends Task {
     //Glob the source files.
     this._files = await Helper.glob(this.params.source, this.params.exclude);
 
-    debugger;
     await this.copy();
   }
 

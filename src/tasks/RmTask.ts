@@ -5,6 +5,8 @@ import { Task } from '../model/Task';
 export class RmTask extends Task {
   name = 'rm';
 
+  protected defaultParams: Partial<RmTaskParams> = { useBuildPath: true }
+
   public params: RmTaskParams;
 
   private checkParams(): null | string {
@@ -20,6 +22,10 @@ export class RmTask extends Task {
       }
     }
 
+    if (this.params.useBuildPath && !this.environment.buildPath) {
+      return "No build path is configured. Either configure a buildPath in the environment, or set 'useBuildPath' to false for this task.";
+    }
+
     return null;
   }
 
@@ -30,8 +36,9 @@ export class RmTask extends Task {
     if (result) throw result;
 
     if (typeof this.params.targets === 'string') this.params.targets = [this.params.targets];
-
+    
     for (let t of this.params.targets) {
+      if (this.params.useBuildPath && this.environment.buildPath) t = this.environment.buildPath + t;
       shelljs.rm('-rf', t);
     }
 
@@ -40,4 +47,5 @@ export class RmTask extends Task {
 
 export interface RmTaskParams {
   targets: string | string[];
+  useBuildPath?: boolean;
 }

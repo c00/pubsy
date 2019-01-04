@@ -142,7 +142,8 @@ BE CAREFUL AS THIS CAN MESS THINGS UP! FILES WILL BE DELETED! (I may or may not 
 
 | Property | type | default | description | 
 | --- | --- | --- | --- |
-| targets | string / string[] |  | The folders to `rm -rf`. 
+| targets | string / string[] |  | The folders and/or files to `rm -rf`. 
+| useBuildPath | boolean | `true` | (optional) When true, it will prepend the targets with the environment buildPath. When true and no buildPath exist, an error will be thrown for safety.
 
 #### Example
 ```yaml
