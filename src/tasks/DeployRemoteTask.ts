@@ -7,6 +7,7 @@ import { CopyToRemoteTask } from './CopyToRemoteTask';
 import { SymlinkRemoteTask } from './SymlinkRemoteTask';
 import { UnzipRemoteTask } from './UnzipTask';
 import { ZipTask } from './ZipTask';
+import { RmTask } from './RmTask';
 
 export class DeployRemoteTask extends Task {
   name = 'deployRemote';
@@ -37,6 +38,7 @@ export class DeployRemoteTask extends Task {
     tasks.push(new CopyToRemoteTask(this.environment, { source: zipName, cwdSource: this.environment.buildPath }, "Copying to remote..."));
     tasks.push(new UnzipRemoteTask(this.environment, { source: zipName, dest: buildId, removeAfter: true }, "Extracting..."));
     tasks.push(new SymlinkRemoteTask(this.environment, { source: buildId, dest: this.environment.deployPath + 'current' }, "Linking new build..."));
+    tasks.push(new RmTask(this.environment, { targets: zipName }, "Removing local zip file..."));
 
     for (let t of tasks) {
       Log.info("  " + t.description);

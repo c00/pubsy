@@ -29,11 +29,12 @@ export class RmTask extends Task {
     const result = this.checkParams();
     if (result) throw result;
 
-    try {
-      shelljs.rm('-rf', this.params.targets)
-    } catch (e) {
-      throw e;
+    if (typeof this.params.targets === 'string') this.params.targets = [this.params.targets];
+
+    for (let t of this.params.targets) {
+      shelljs.rm('-rf', t);
     }
+
   }
 }
 
