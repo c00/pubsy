@@ -5,6 +5,7 @@ import { FileInfo } from '../model/FileInfo';
 import { Helper } from '../model/Helper';
 import { Log } from '../model/Log';
 import { Task } from '../model/Task';
+import { lstatSync } from 'fs';
 
 
 export class CopyToRemoteTask extends Task {
@@ -45,17 +46,19 @@ export class CopyToRemoteTask extends Task {
   public async run(): Promise<any> {
     this.setDefaults();
 
+    debugger;
     Log.debug("  Destination: " + this.params.dest);
     const result = this.checkParams();
 
     if (result) throw result;
 
     //Change working directory
-    if (this.params.cwd) shelljs.cd(this.params.cwd);
+    if (this.params.cwdSource) shelljs.cd(this.params.cwdSource);
 
     //Glob the source files.
     this._files = await Helper.glob(this.params.source, this.params.exclude);
 
+    debugger;
     await this.copy();
   }
 
@@ -67,6 +70,9 @@ export class CopyToRemoteTask extends Task {
       //Make dir if necessary
       const destPath = dirname(dest);
       await this.environment.remote.mkdir(destPath);
+
+      //Skip directories
+      if (lstatSync(f.resolved).isDirectory()) continue;
 
       //Copy files
       await this.environment.remote.putFile(f.relative, dest);
@@ -85,5 +91,5 @@ export interface CopyToRemoteTaskParams {
   source: string | string[];
   exclude?: string | string[];
   dest?: string;
-  cwd?: string;
+  cwdSource?: string;
 }

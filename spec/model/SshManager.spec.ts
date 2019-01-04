@@ -2,20 +2,20 @@ import 'jasmine';
 
 import { readFileSync } from 'fs';
 import * as yaml from 'js-yaml';
+import * as moment from 'moment';
 
 import { Config } from '../../src/model/Config';
 import { SshManager } from '../../src/model/SshManager';
-import { FileHelper } from '../helpers/FileHelper';
 import { CopyTaskParams } from '../../src/tasks/CopyTask';
 import { ZipTask } from '../../src/tasks/ZipTask';
-import * as moment from 'moment';
+import { FileHelper } from '../helpers/FileHelper';
 
 describe("SSH Manager tests", () => {
   //Setup remote env
   const config: Config = yaml.safeLoad(readFileSync('pubsy-remote-test.yml', 'utf8'));
   const env = config.environments[0];
   //This ensures misconfiguration doesn't result in deletion of stuff.
-  env.deployPath += moment().format('YYYY-MM-DD') + "/"; 
+  env.deployPath += moment().format('YYYY-MM-DD') + "/";
   const ssh = new SshManager(config.environments[0]);
 
   it("Should connect successfully", async (done) => {
@@ -139,6 +139,68 @@ describe("SSH Manager tests", () => {
 
     //zip file still remains?
     expect(await ssh.exists(remoteZip)).toBe(true);
+
+    done();
+  });
+
+  it("tests symlinks with cwd", async (done) => {
+    //Clean test env
+    await FileHelper.cleanRemote(ssh, env);
+
+    //Create 2 files
+    const file1 = env.deployPath + "file1.txt";
+    await ssh.putFile("test/assets/file.txt", file1);
+
+    const file2 = env.deployPath + "file2.txt";
+    await ssh.putFile("test/assets/another-file.txt", file2);
+
+    //Create a symlink
+    const linkName = "a-link.txt"
+    await ssh.symlink(`file1.txt`, linkName, env.deployPath);
+
+    //Check type is link, target is correct, and that the content is file 1
+    expect(await ssh.exists(env.deployPath + linkName)).toBe(true);
+    expect(await ssh.exec("readlink", [env.deployPath + linkName])).toBe("file1.txt");
+    expect(await ssh.exec("cat", [env.deployPath + linkName])).toBe("This is a demo file for testing");
+
+    //Overwrite symlink
+    await ssh.symlink(`file2.txt`, linkName, env.deployPath);
+
+    //Check that type is link, target is correct, and that the content is file 2
+    expect(await ssh.exists(env.deployPath + linkName)).toBe(true);
+    expect(await ssh.exec("readlink", [env.deployPath + linkName])).toBe("file2.txt");
+    expect(await ssh.exec("cat", [env.deployPath + linkName])).toBe("Foo walks into a bar.");
+
+    done();
+  });
+
+  it("tests symlinks without cwd", async (done) => {
+    //Clean test env
+    await FileHelper.cleanRemote(ssh, env);
+
+    //Create 2 files
+    const file1 = env.deployPath + "file1.txt";
+    await ssh.putFile("test/assets/file.txt", file1);
+
+    const file2 = env.deployPath + "file2.txt";
+    await ssh.putFile("test/assets/another-file.txt", file2);
+
+    //Create a symlink
+    const linkName = "a-link.txt"
+    await ssh.symlink(`file1.txt`, env.deployPath + linkName);
+
+    //Check type is link, target is correct, and that the content is file 1
+    expect(await ssh.exists(env.deployPath + linkName)).toBe(true);
+    expect(await ssh.exec("readlink", [env.deployPath + linkName])).toBe("file1.txt");
+    expect(await ssh.exec("cat", [env.deployPath + linkName])).toBe("This is a demo file for testing");
+
+    //Overwrite symlink
+    await ssh.symlink(`file2.txt`, env.deployPath + linkName);
+
+    //Check that type is link, target is correct, and that the content is file 2
+    expect(await ssh.exists(env.deployPath + linkName)).toBe(true);
+    expect(await ssh.exec("readlink", [env.deployPath + linkName])).toBe("file2.txt");
+    expect(await ssh.exec("cat", [env.deployPath + linkName])).toBe("Foo walks into a bar.");
 
     done();
   });

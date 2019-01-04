@@ -15,7 +15,7 @@ export class SymlinkRemoteTask extends Task {
     const result = this.checkParams();
     if (result) throw result;
 
-    return this.environment.remote.symlink(this.params.source, this.params.dest);
+    return this.environment.remote.symlink(this.params.source, this.params.dest, this.params.cwd);
   }
 
   protected setDefaults() {
@@ -51,4 +51,5 @@ export class SymlinkRemoteTask extends Task {
 export interface SymlinkRemoteTaskParams {
   source: string;
   dest: string;
+  cwd?: string;
 }

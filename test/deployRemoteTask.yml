@@ -2,7 +2,7 @@ tasks:
   - name: deployRemote
     description: Deploy to remote
     params: 
-      source: testFiles.zip
+      source: test/**/*
 
 environments: 
   - name: Bessy

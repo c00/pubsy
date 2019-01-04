@@ -12,7 +12,7 @@ import { NgBuildTask } from '../tasks/NgBuildTask';
 import { RmTask } from '../tasks/RmTask';
 import { RollbackRemoteTask, RollbackRemoteTaskOptions } from '../tasks/RollbackRemoteTask';
 import { SymlinkRemoteTask } from '../tasks/SymlinkRemoteTask';
-import { UnzipTask } from '../tasks/UnzipTask';
+import { UnzipRemoteTask } from '../tasks/UnzipTask';
 import { ZipTask } from '../tasks/ZipTask';
 import { Config } from './Config';
 import { Environment } from './Environment';
@@ -27,7 +27,7 @@ export class Pubsy {
     rm: RmTask,
     zip: ZipTask,
     copyToRemote: CopyToRemoteTask,
-    unzipRemote: UnzipTask,
+    unzipRemote: UnzipRemoteTask,
     deployRemote: DeployRemoteTask,
     rollbackRemote: RollbackRemoteTask,
     symlinkRemote: SymlinkRemoteTask,

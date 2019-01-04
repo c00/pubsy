@@ -97,9 +97,14 @@ export class SshManager {
     }
   }
 
-  public async symlink(source: string, dest: string) {
+  public async symlink(source: string, dest: string, cwd?: string) {
     await this.connect();
-    return this.exec('ln', ['-nsf', source, dest]);
+    
+    if (cwd && !await this.exists(cwd)) throw new Error("Working dir doesn't exist: " + cwd);
+
+    const cmd = cwd ? `cd ${cwd} && ln` : "ln";
+
+    return this.exec(cmd, ['-nsf', source, dest]);
   }
 
   public dispose() {

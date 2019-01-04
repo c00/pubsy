@@ -5,7 +5,7 @@ import { Log } from '../model/Log';
 import { Task } from '../model/Task';
 import { CopyToRemoteTask } from './CopyToRemoteTask';
 import { SymlinkRemoteTask } from './SymlinkRemoteTask';
-import { UnzipTask } from './UnzipTask';
+import { UnzipRemoteTask } from './UnzipTask';
 import { ZipTask } from './ZipTask';
 
 export class DeployRemoteTask extends Task {
@@ -33,9 +33,9 @@ export class DeployRemoteTask extends Task {
 
     //Setup tasks
     const zipName = 'build.zip';
-    tasks.push(new ZipTask(this.environment, { source: '**/*', dest: zipName }, "Compressing..."));
+    tasks.push(new ZipTask(this.environment, { ...this.params, dest: zipName }, "Compressing..."));
     tasks.push(new CopyToRemoteTask(this.environment, { source: zipName, cwd: this.environment.buildPath }, "Copying to remote..."));
-    tasks.push(new UnzipTask(this.environment, { source: zipName, dest: buildId, removeAfter: true }, "Extracting..."));
+    tasks.push(new UnzipRemoteTask(this.environment, { source: zipName, dest: buildId, removeAfter: true }, "Extracting..."));
     tasks.push(new SymlinkRemoteTask(this.environment, { source: buildId, dest: this.environment.deployPath + 'current' }, "Linking new build..."));
 
     for (let t of tasks) {
@@ -73,4 +73,6 @@ export class DeployRemoteTask extends Task {
 
 export interface DeployRemoteTaskOptions {
   source: string | string[];
+  exclude?: string | string[];
+  cwd?: string;
 }

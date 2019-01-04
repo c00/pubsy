@@ -4,13 +4,13 @@ import { Task } from '../model/Task';
 
 
 
-export class UnzipTask extends Task {
-  name = 'unzip';
+export class UnzipRemoteTask extends Task {
+  name = 'unzipRemote';
 
   protected defaultParams: UnzipTaskParams = { source: 'files.zip', removeAfter: false, dest: '' };
   public params: UnzipTaskParams;
 
-  public run(): Promise<any> {
+  public async run(): Promise<any> {
     this.setDefaults();
 
     //Prepend the deployPath
@@ -20,16 +20,16 @@ export class UnzipTask extends Task {
     }
 
     //Create dir if it doesn't exist yet.
-    return this.environment.remote.mkdir(this.params.dest)
-    //Unzip
-      .then(() => this.environment.remote.unzip(this.params.source, this.params.dest, this.params.removeAfter));
+    await this.environment.remote.mkdir(this.params.dest)
 
+    //Unzip
+    await this.environment.remote.unzip(this.params.source, this.params.dest, this.params.removeAfter);
   }
 
 }
 
 export interface UnzipTaskParams {
   source: string;
-  dest: string;
-  removeAfter: boolean;
+  dest?: string;
+  removeAfter?: boolean;
 }
