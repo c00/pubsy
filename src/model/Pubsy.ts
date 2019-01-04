@@ -68,7 +68,7 @@ export class Pubsy {
 
   public fromCli() {
     commander
-      .version('0.1.0')
+      .version('1.0.4')
       .option('-c --config <name>', 'Name or Path to pubsy config file. Names are matched on pubsy-[name].yml. Defaults to pubsy.yml')
       .option('-e --environment <name>', 'Environment name. If no environments are defined, ignore this option.')
       .option('-v --verbose', 'More output than usual.');
