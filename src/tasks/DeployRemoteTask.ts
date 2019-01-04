@@ -34,7 +34,7 @@ export class DeployRemoteTask extends Task {
     //Setup tasks
     const zipName = 'build.zip';
     tasks.push(new ZipTask(this.environment, { ...this.params, dest: zipName }, "Compressing..."));
-    tasks.push(new CopyToRemoteTask(this.environment, { source: zipName, cwd: this.environment.buildPath }, "Copying to remote..."));
+    tasks.push(new CopyToRemoteTask(this.environment, { source: zipName, cwdSource: this.environment.buildPath }, "Copying to remote..."));
     tasks.push(new UnzipRemoteTask(this.environment, { source: zipName, dest: buildId, removeAfter: true }, "Extracting..."));
     tasks.push(new SymlinkRemoteTask(this.environment, { source: buildId, dest: this.environment.deployPath + 'current' }, "Linking new build..."));
 
