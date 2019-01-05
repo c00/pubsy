@@ -26,6 +26,8 @@ export class DeployLocalTask extends Task {
 
     if (!this.params.source) throw "No source files.";
 
+    Log.debug("Deploy Params", this.params);
+
     const wd = shelljs.pwd();
     let tasks: Task[] = [];
 
@@ -49,7 +51,7 @@ export class DeployLocalTask extends Task {
     const amount = this.environment.keepDeployments || 10;
 
     //find out how many there are
-    const result = shelljs.ls('ls', [this.environment.deployPath]);
+    const result = shelljs.ls(this.environment.deployPath);
     const list = result.filter(s => s.startsWith('build-')).sort();
 
     if (list.length > amount) {

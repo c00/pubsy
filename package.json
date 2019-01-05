@@ -2,7 +2,7 @@
   "name": "pubsy",
   "version": "1.0.5",
   "description": "Deployment / Publishing library for Angular 2+ and other things.",
-  "main": "bin/index.js",
+  "main": "bin/src/index.js",
   "scripts": {
     "build": "tsc --outDir bin",
     "tsw": "tsc --outDir bin -w",
@@ -11,7 +11,7 @@
     "prepublish": "npm run build"
   },
   "bin": {
-    "pubsy": "./bin/index.js"
+    "pubsy": "./bin/src/index.js"
   },
   "engines": {
     "node": ">=8.11.3"

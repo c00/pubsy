@@ -54,6 +54,8 @@ export class CopyTask extends Task {
     //Glob the source files.
     this._files = await Helper.glob(this.params.source, this.params.exclude);
 
+    Log.debug("Params: ", this.params);
+
     //Change working directory for Destination
     shelljs.cd(this.originalWorkingDir);
 
@@ -70,7 +72,7 @@ export class CopyTask extends Task {
       //Make dir if necessary
       const wd = shelljs.pwd() + "/";
       const destPath = dirname(dest);
-      if (!existsSync(destPath)) shelljs.mkdir('-p', wd + destPath);
+      if (!existsSync(destPath)) shelljs.mkdir('-p', destPath);
 
       //Copy files
       if (lstatSync(f.resolved).isFile()) copyFileSync(f.resolved, dest);
