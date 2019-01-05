@@ -18,6 +18,8 @@ import { Config } from './Config';
 import { Environment } from './Environment';
 import { Log } from './Log';
 import { SshManager } from './SshManager';
+import { DeployLocalTask } from '../tasks/DeployLocalTask';
+import { SymlinkTask } from '../tasks/SymLinkTask';
 
 export class Pubsy {
   private taskList = {
@@ -31,6 +33,8 @@ export class Pubsy {
     deployRemote: DeployRemoteTask,
     rollbackRemote: RollbackRemoteTask,
     symlinkRemote: SymlinkRemoteTask,
+    deployLocal: DeployLocalTask,
+    symlink: SymlinkTask,
   };
 
   private yamlFile: string;

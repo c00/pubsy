@@ -11,7 +11,7 @@ import { Task } from '../model/Task';
 export class CopyTask extends Task {
   name = 'copy';
 
-  protected defaultParams: Partial<CopyTaskParams> = { dest: '' }
+  protected defaultParams: Partial<CopyTaskParams> = { dest: '', prependBuildPathToDest: true }
   private _files: FileInfo[] = [];
   public params: CopyTaskParams;
   private originalWorkingDir: string;
@@ -36,13 +36,13 @@ export class CopyTask extends Task {
   protected setDefaults() {
     super.setDefaults();
     this.originalWorkingDir = shelljs.pwd();
+
+    //Prepend the buildPath
+    if (this.environment.buildPath && this.params.prependBuildPathToDest) this.params.dest = this.environment.buildPath + this.params.dest;
   }
 
   public async run() {
     this.setDefaults();
-
-    //Prepend the buildPath
-    if (this.environment.buildPath) this.params.dest = this.environment.buildPath + this.params.dest;
 
     //Check Parameters
     const result = this.checkParams();
@@ -97,4 +97,5 @@ export interface CopyTaskParams {
   dest: string;
   flatten?: boolean;
   cwdSource?: string;
+  prependBuildPathToDest?: boolean;
 }
