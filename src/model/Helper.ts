@@ -75,4 +75,10 @@ export class Helper {
       });
     });
   }
+
+  public static joinPaths(root: string, add: string): string {
+    if (root.substring(root.length - 1) !== '/') root += "/"
+
+    return root + add;
+  }
 }

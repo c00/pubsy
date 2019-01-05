@@ -1,6 +1,8 @@
 import { resolve } from 'path';
 
 import { Task } from '../model/Task';
+import { FileHelper } from '../../spec/helpers/FileHelper';
+import { Helper } from '../model/Helper';
 
 
 
@@ -15,8 +17,8 @@ export class UnzipRemoteTask extends Task {
 
     //Prepend the deployPath
     if (this.environment.deployPath) {
-      this.params.source = this.environment.deployPath + this.params.source;
-      this.params.dest = this.environment.deployPath + this.params.dest;
+      this.params.source = Helper.joinPaths(this.environment.deployPath, this.params.source);
+      this.params.dest = Helper.joinPaths(this.environment.deployPath , this.params.dest);
     }
 
     //Create dir if it doesn't exist yet.

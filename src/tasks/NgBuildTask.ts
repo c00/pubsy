@@ -27,7 +27,9 @@ export class NgBuildTask extends Task {
       shelljs.cd(this.params.cwd);
     }
 
-    const cmd = `ng build --output-path "${this.params.dest}" --base-href "${this.params.base}" --prod`;
+    const ngConfig = this.params.configuration ? `--configuration="${this.params.configuration}"` : '';
+
+    const cmd = `ng build --output-path "${this.params.dest}" --base-href "${this.params.base}" ${ngConfig} --prod`;
     Log.debug("  Running: " + cmd);
     execSync(cmd, { stdio: 'inherit' });
 
@@ -38,4 +40,5 @@ export interface NgBuildTaskParams {
   base?: string;
   dest?: string;
   cwd?: string;
+  configuration?: string
 }

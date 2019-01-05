@@ -226,6 +226,7 @@ Create an angular build using the `ng` command line tool.
 |base| string | `/` | (optional) The base element (`<base href="/">`)
 |cwd| string | Empty string` | (optional) The directory where the angular project is.
 |dest| string | `dist/` | (optional) The destination. This will be prepended with the Environment `buildPath` if available.
+|configuration| string | `null` | (optional) The config to use for the build (the `--configuration` flag of `ng build`)
 
 #### Example
 ```yaml
