@@ -1,0 +1,24 @@
+tasks: 
+  - name: npm
+    description: Show npm version
+    label: npm-version-example
+    params: 
+      params: --version
+  - name: npm
+    description: Show npm install help
+    label: npm-install-help-example
+    params: 
+      params: 
+        - install
+        - --help
+  - name: npm
+    description: Npm list packages
+    label: npm-list-example
+    params: 
+      params: 
+        - list
+        - --depth=0
+environments: 
+  - name: local
+    buildPath: test/.build/
+    default: true

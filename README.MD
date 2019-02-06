@@ -8,6 +8,7 @@ It's currently very much a work in process.
 ## Features
 It has tasks for many common actions such as:
 - Create angular build: `ng build [params]`
+- Create Angular Universal build
 - Copying files around locally
 - Copy files to remote server (compressed)
 - Create symlinks for deployments and settings files/folders

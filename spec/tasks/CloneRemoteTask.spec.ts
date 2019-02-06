@@ -1,15 +1,13 @@
 import 'jasmine';
 
-import { existsSync, readFileSync } from 'fs';
 import * as yaml from 'js-yaml';
 import * as moment from 'moment';
-import { rm } from 'shelljs';
 
 import { Config } from '../../src/model/Config';
 import { SshManager } from '../../src/model/SshManager';
 import { CloneRemoteTaskParams, CloneRemoteTask } from '../../src/tasks/CloneRemoteTask';
-import { SymlinkTask } from '../../src/tasks/SymLinkTask';
 import { FileHelper } from '../helpers/FileHelper';
+import { readFileSync } from 'fs';
 
 const defaultParams: CloneRemoteTaskParams = {
   repo: 'git@github.com:c00/pubsy.git',

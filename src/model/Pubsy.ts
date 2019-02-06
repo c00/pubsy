@@ -21,6 +21,7 @@ import { SshManager } from './SshManager';
 import { DeployLocalTask } from '../tasks/DeployLocalTask';
 import { SymlinkTask } from '../tasks/SymLinkTask';
 import { CloneRemoteTask } from '../tasks/CloneRemoteTask';
+import { NpmTask } from '../tasks/NpmTask';
 
 export class Pubsy {
   private taskList = {
@@ -37,6 +38,7 @@ export class Pubsy {
     deployLocal: DeployLocalTask,
     symlink: SymlinkTask,
     cloneRemote: CloneRemoteTask,
+    npm: NpmTask,
   };
 
   private yamlFile: string;
