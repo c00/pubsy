@@ -16,7 +16,7 @@ export class SshManager {
   //todo should this just be resolve?
   private replaceHomeFolder(string?: string): string {
     if (!string) string = '~/.ssh/id_rsa';
-    if (string.substring(0,1) !== '~') return string;
+    if (string.substring(0, 1) !== '~') return string;
 
     const homeFolder = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
     return string.replace('~', homeFolder);
@@ -28,7 +28,7 @@ export class SshManager {
     if (!this.env.isRemote || !this.env.host) throw "Environments isn't remote or host is missing";
 
     Log.debug("  Connecting to remote...");
-    
+
     this.ssh = new SSH();
     let config = {
       host: this.env.host,
@@ -37,7 +37,7 @@ export class SshManager {
     };
 
     await this.ssh.connect(config);
-    this.connected = true;       
+    this.connected = true;
   }
 
   public async putFile(local: string, remote: string): Promise<any> {
@@ -70,7 +70,7 @@ export class SshManager {
     return result.split(' ')[0];
   }
 
-  public async exec(command: string, params?: string[], options?: any): Promise<string> {
+  public async exec(command: string, params?: string[], options?: any): Promise<string|any> {
     if (!params) params = [];
     Log.debug(`  Exec: ${command} ${params.join(' ')}`)
     await this.connect();
@@ -79,8 +79,26 @@ export class SshManager {
   }
 
   public async mkdir(path: string) {
-    await this.connect();
     return this.exec('mkdir', ['-p', path]);
+  }
+
+  public async clone(repo: string, dest: string) {
+    let err = [];
+    let out = [];
+    const options = {
+      cwd: dest,
+      stream: 'both',
+      /* onStderr: ( (chunk: Buffer) => err.push(chunk.toString('utf-8')) ), */
+      /* todo find some way to stream the output nicely. */
+      /* onStdout: ( (chunk: Buffer) => console.log(chunk.toString('utf-8')) ),   */
+      options: { pty: true } //pty stops it from erroring
+    };
+
+    const result = await this.exec(`git`, ['clone', repo], options);
+
+    if (result.code === 0) return;
+
+    throw new Error(result.stdout);
   }
 
   public async unzip(file: string, dest: string, removeFileAfter?: boolean) {
@@ -99,12 +117,10 @@ export class SshManager {
 
   public async symlink(source: string, dest: string, cwd?: string) {
     await this.connect();
-    
+
     if (cwd && !await this.exists(cwd)) throw new Error("Working dir doesn't exist: " + cwd);
 
-    const cmd = cwd ? `cd ${cwd} && ln` : "ln";
-
-    return this.exec(cmd, ['-nsf', source, dest]);
+    return this.exec('ln', ['-nsf', source, dest], { cwd });
   }
 
   public dispose() {

@@ -2,9 +2,23 @@ import * as glob from 'glob';
 import * as path from 'path';
 
 import { FileInfo } from './FileInfo';
+import { Environment } from './Environment';
 
 export class Helper {
-  public static replaceAll(subject: string, find: string, replace: string) {
+
+  public static replaceEnvironmentVariables(value: string, environment: Environment): string {
+    for (let k in environment) {
+      if (!environment.hasOwnProperty(k)) continue;
+      if (typeof environment[k] !== 'string') continue;
+
+      const placeholder = `%${k}%`;
+      value = Helper.replaceAll(value, placeholder, environment[k]);
+    }  
+
+    return value;
+  }
+
+  public static replaceAll(subject: string, find: string, replace: string): string {
     return subject.split(find).join(replace);
   }
 
