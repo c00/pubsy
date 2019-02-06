@@ -22,6 +22,7 @@ import { DeployLocalTask } from '../tasks/DeployLocalTask';
 import { SymlinkTask } from '../tasks/SymLinkTask';
 import { CloneRemoteTask } from '../tasks/CloneRemoteTask';
 import { NpmTask } from '../tasks/NpmTask';
+import { NpmRemoteTask } from '../tasks/NpmRemoteTask';
 
 export class Pubsy {
   private taskList = {
@@ -39,6 +40,7 @@ export class Pubsy {
     symlink: SymlinkTask,
     cloneRemote: CloneRemoteTask,
     npm: NpmTask,
+    npmRemote: NpmRemoteTask,
   };
 
   private yamlFile: string;

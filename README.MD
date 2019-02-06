@@ -362,3 +362,5 @@ If a deployment is not available, an error will be thrown.
 [ ] Testing of some tasks
 [ ] Error handling could be improved
 [ ] A way for custom tasks to be loaded dynamically
+[ ] Add documentation for npmTask and cloneRemoteTask
+[ ] Empty command (`pubsy`) doesn't return anything at all

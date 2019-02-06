@@ -32,6 +32,34 @@ describe("Zip functions", () => {
     done();
   });
 
+  it("Tries the cwd param", async (done) => {
+    fh.rimraf(dir + "*");
+    expect(fh.countFilesAndFolders(dir, true)).toBe(0);
+
+    const params = { ...defaultParams, cwd: 'test', source: 'assets/**/*' }
+    const t = new ZipTask(null, params);
+    await t.run();
+
+    expect(existsSync(defaultParams.dest)).toBe(true);
+    expect(fh.countFilesAndFolders(dir, true)).toBe(1);
+
+    done();
+  });
+
+  it("Tries the cwd param again", async (done) => {
+    fh.rimraf(dir + "*");
+    expect(fh.countFilesAndFolders(dir, true)).toBe(0);
+
+    const params = { ...defaultParams, cwd: '../', source: 'pubsy/test/assets/**/*' }
+    const t = new ZipTask(null, params);
+    await t.run();
+
+    expect(existsSync(defaultParams.dest)).toBe(true);
+    expect(fh.countFilesAndFolders(dir, true)).toBe(1);
+
+    done();
+  });
+
   it("Zips none of things", async (done) => {
     fh.rimraf(dir + "*");
     expect(fh.countFilesAndFolders(dir, true)).toBe(0);
