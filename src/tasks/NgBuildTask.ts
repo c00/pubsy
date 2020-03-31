@@ -32,12 +32,7 @@ export class NgBuildTask extends Task {
     const cmd = `npx ng build --output-path "${this.params.dest}" --base-href "${this.params.base}" ${ngConfig} --prod`;
     Log.debug("  Running: " + cmd);
 
-    try {
-      execSync(cmd, { stdio: 'inherit' });
-    } catch (err) {
-      console.log("execSybc failed", err);
-      throw err;
-    }
+    execSync(cmd, { stdio: 'inherit' });    
 
   } 
 }
