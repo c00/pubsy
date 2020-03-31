@@ -1,6 +1,6 @@
 {
   "name": "pubsy",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Deployment / Publishing library for Angular 2+ and other things.",
   "main": "bin/src/index.js",
   "scripts": {
