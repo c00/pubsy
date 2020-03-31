@@ -226,6 +226,7 @@ export class Pubsy {
         } catch (ex) {
           Log.error(`Error while running ${t.name}: ${t.description}`)
           Log.error(t);
+          Log.error(ex);
           shouldStop = true;
           break;
         }
@@ -258,6 +259,7 @@ export class Pubsy {
         } catch (ex) {
           Log.error(`Error while running ${t.name}: ${t.description}`)
           Log.error(t);
+          Log.error(ex);
           shouldStop = true;
           break;
         }
