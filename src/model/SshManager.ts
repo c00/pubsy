@@ -29,13 +29,25 @@ export class SshManager {
 
     Log.debug("  Connecting to remote...");
 
+    const sshAuthSocket = process.env.SSH_AUTH_SOCK;
     this.ssh = new SSH();
     let config = {
       host: this.env.host,
       username: this.env.user || username.sync(),
-      privateKey: this.replaceHomeFolder(this.env.key) || this.replaceHomeFolder()
+      agent: undefined,
+      privateKey: undefined,
     };
 
+    if (this.env.key) {
+      config.privateKey = this.replaceHomeFolder(this.env.key);
+    } else {
+      config.agent = sshAuthSocket;
+    }
+
+    //debug
+    Log.debug("  SSH Socket: ", sshAuthSocket);
+
+    //Log.debug(`  Using key: ${config.privateKey}`);
     await this.ssh.connect(config);
     this.connected = true;
   }
