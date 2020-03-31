@@ -3,3 +3,4 @@ node_modules
 /test/.test-files
 /test/.*
 pubsy-remote-test.yml
+.build
