@@ -78,7 +78,7 @@ export class Pubsy {
 
   public fromCli() {
     commander 
-      .version('1.0.5')
+      .version('1.0.6')
       .option('-c --config <name>', 'Name or Path to pubsy config file. Names are matched on pubsy-[name].yml. Defaults to pubsy.yml')
       .option('-e --environment <name>', 'Environment name. If no environments are defined, ignore this option.')
       .option('-v --verbose', 'More output than usual.');
@@ -209,9 +209,12 @@ export class Pubsy {
   }
 
   private async runTasks() {
+    let shouldStop = false;
+
     const wd = resolve(shelljs.pwd() + "");
 
     for (let e of this.environments) {
+      if (shouldStop) break;
 
       for (let t of e.taskList) {
         //Reset working directory
@@ -223,18 +226,28 @@ export class Pubsy {
         } catch (ex) {
           Log.error(`Error while running ${t.name}: ${t.description}`)
           Log.error(t);
-          throw ex;
+          shouldStop = true;
+          break;
         }
 
       }
       e.remote.dispose();
     }
 
-    Log.success("Pubsy done!");
+    if (!shouldStop){
+      Log.success("Pubsy done!");
+      process.exit(0);
+    } else {
+      Log.error("Pubsy Failed.");
+      process.exit(1);
+    }
   }
 
   private async runTask(label: string) {
+    let shouldStop = false;
+
     for (let e of this.environments) {
+      if (shouldStop) break;
 
       for (let t of e.taskList) {
         if (t.label !== label) continue;
@@ -245,7 +258,8 @@ export class Pubsy {
         } catch (ex) {
           Log.error(`Error while running ${t.name}: ${t.description}`)
           Log.error(t);
-          throw ex;
+          shouldStop = true;
+          break;
         }
 
       }
@@ -253,8 +267,13 @@ export class Pubsy {
       e.remote.dispose();
     }
 
-    Log.success("Pubsy done!");
-    process.exit(0);
+    if (!shouldStop){
+      Log.success("Pubsy done!");
+      process.exit(0);
+    } else {
+      Log.error("Pubsy Failed.");
+      process.exit(1);
+    }
   }
 
   private async doRollback(amountOrBuildId?) {
